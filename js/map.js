@@ -2,7 +2,7 @@
 // CONFIGURATION - CHANGE THESE VALUES
 // ============================================
 
-const CSV_FILE = "health_data_v2.csv";
+const CSV_FILE = "data/health_data_v2.csv";
 const VARIABLE_NAME = "FOODINSECU_CrudePrev";
 const STATE_COLUMN = "StateDesc";
 const COUNTY_COLUMN = "CountyName";
