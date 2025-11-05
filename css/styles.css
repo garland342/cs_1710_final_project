@@ -1,0 +1,568 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f7fa;
+}
+
+#header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 30px 20px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+#header h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+#header p {
+    font-size: 16px;
+    opacity: 0.9;
+}
+
+#container {
+    display: flex;
+    gap: 30px;
+    max-width: 1600px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+#map-container {
+    flex: 1;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 20px;
+    position: relative;
+}
+
+#map {
+    position: relative;
+}
+
+.state {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.state:hover {
+    stroke: #667eea;
+    stroke-width: 2px;
+}
+
+.county {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.county:hover {
+    stroke: #667eea;
+    stroke-width: 2px;
+    opacity: 0.8;
+}
+
+.state-boundary {
+    fill: none;
+    stroke: #333;
+    stroke-width: 2px;
+    pointer-events: none;
+}
+
+#reset-button {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    display: none;
+    z-index: 1000;
+    transition: all 0.3s;
+}
+
+#reset-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+#reset-button.visible {
+    display: block;
+}
+
+#info-panel {
+    width: 400px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 0;
+    height: fit-content;
+    position: sticky;
+    top: 30px;
+    overflow: hidden;
+}
+
+#info-panel.hidden {
+    display: none;
+}
+
+.panel-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 25px;
+}
+
+.panel-header h2 {
+    font-size: 28px;
+    margin-bottom: 5px;
+}
+
+.panel-header .subtitle {
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.panel-content {
+    padding: 25px;
+}
+
+.info-section {
+    margin-bottom: 25px;
+}
+
+.info-section:last-child {
+    margin-bottom: 0;
+}
+
+.info-section h3 {
+    color: #667eea;
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.info-section h3::before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 2px;
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.stat-card {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.stat-row:last-child {
+    border-bottom: none;
+}
+
+.stat-row .label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 14px;
+}
+
+.stat-row .value {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.county-list {
+    max-height: 300px;
+    overflow-y: auto;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.county-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.county-list::-webkit-scrollbar-track {
+    background: #e9ecef;
+    border-radius: 4px;
+}
+
+.county-list::-webkit-scrollbar-thumb {
+    background: #667eea;
+    border-radius: 4px;
+}
+
+.county-item {
+    padding: 10px;
+    margin-bottom: 8px;
+    background: white;
+    border-radius: 6px;
+    border-left: 3px solid #667eea;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.county-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.county-item:last-child {
+    margin-bottom: 0;
+}
+
+.county-name {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.county-value {
+    color: #667eea;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+.rank-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-left: 8px;
+}
+
+.instruction {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.instruction svg {
+    width: 64px;
+    height: 64px;
+    opacity: 0.3;
+}
+
+#legend {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+#legend h4 {
+    margin-bottom: 10px;
+    color: #495057;
+    font-size: 14px;
+}
+
+header {
+  text-align: center;
+  margin-top: 40px;
+  margin-bottom: 15px;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  text-align: center;
+  line-height: 1.3;
+  padding: 0 20px;
+}
+
+.title-divider {
+  border: none;
+  border-top: 3px solid #000000;
+  margin: 0;
+  width: 100%;
+}
+
+.section-divider {
+  border: none;
+  border-top: 3px solid #000000;
+  margin: 0;
+  width: 100%;
+}
+
+/* Style for "How does geography predict..." section */
+.geography-section {
+  text-align: center;
+  padding: 20px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.geography-section p {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0;
+  color: #000000;
+  text-align: center;
+}
+
+/* NEW STYLE: Style for bold, centered header sections (reused for new headers) */
+.new-section-header {
+  text-align: center;
+  padding: 20px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.new-section-header p {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0;
+  color: #000000;
+  text-align: center;
+}
+
+/* Style for "From city block to country roads..." section */
+.subtitle-section {
+  text-align: center;
+  padding: 20px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.subtitle-section p {
+  font-size: 1.5rem;
+  font-style: italic;
+  margin: 0;
+  padding-left: 60px;
+  color: #000000;
+  text-align: center;
+}
+
+.whitespace-section {
+  height: 150px;
+}
+
+.split-layout-bottom {
+  margin-top: 0;
+  min-height: 600px;
+}
+
+/* Extra space below h2 in bottom section */
+.split-layout-bottom h2 {
+  margin-bottom: 60px;
+}
+
+/* Class for the new Food Desert section */
+.split-layout-top-section {
+    margin-top: 0;
+    min-height: 600px;
+    position: relative;
+}
+
+/* Add an overlay border that definitely stretches full height */
+.split-layout-top-section::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -3px;
+  height: calc(100% + 6px);
+  width: 2px;
+  background-color: #000000;
+  transform: translateX(-50%);
+  z-index: 10;
+}
+
+/* Split layout for two sections (generic) */
+.split-layout {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0;
+  position: relative;
+  min-height: 100px;
+}
+
+/* Vertical divider that extends to top (generic, used for introductory section) */
+.split-layout::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -15px; 
+  bottom: 0; 
+  width: 2px;
+  background-color: #000000;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+/* FIX 2: Specific rule for the TOP section - NO vertical border */
+.split-layout-top-section::before {
+  display: none;
+}
+
+/* FIX 3: Specific rule for the BOTTOM section (Depression section) */
+.split-layout-bottom::before {
+  top: 0;
+  bottom: 0;
+}
+
+/* Left and right sections */
+.left-section,
+.right-section {
+  flex: 1;
+  padding: 30px 40px; 
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Vertical divider between the two sides */
+.left-section {
+  border-right: none;
+  text-align: center;
+}
+
+.right-section {
+  text-align: center;
+}
+
+/* Center align text content inside sections */
+.left-section p,
+.right-section p {
+  text-align: center;
+}
+
+/* USDA Definition box styling */
+.definition-box {
+  background-color: #d4cfc7;
+  border: 2px solid #000000;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  text-align: left !important;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Headings and text */
+h2 {
+  font-size: 1.5rem;
+  margin-top: 0; 
+  margin-bottom: 40px;
+  color: #000000;
+}
+
+p, li {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #000000;
+  text-align: left;
+}
+
+/* Right column list */
+.right-section ul {
+  list-style-type: disc;
+  margin-top: 0;
+  padding-left: 20px;
+  display: inline-block;
+  text-align: left;
+}
+
+/* Responsive layout for small screens */
+@media (max-width: 768px) {
+  .split-layout {
+    flex-direction: column;
+  }
+
+  .split-layout::before {
+    display: none;
+  }
+
+  .left-section {
+    border-right: none;
+    border-bottom: 2px solid #000000;
+  }
+}
+
+/* Styling for the Voronoi container */
+#voronoi-container {
+  max-width: 1200px;
+  margin: 20px auto; 
+  display: flex; 
+  justify-content: center;
+  align-items: center;
+  min-height: 400px; 
+  background-color: #f9f9f9; 
+  border: 1px solid #ccc;
+}
+
+/* Voronoi instruction text */
+.voronoi-instruction {
+  text-align: center;
+  padding: 20px 40px 10px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.voronoi-instruction p {
+  font-size: 1rem;
+  font-style: italic;
+  color: #000000;
+  margin: 0;
+}

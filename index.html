@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>US State Map Visualization</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+      <h1>Mapping the Weight of Distance: How Poverty, Health, and Hunger Intersect in America</h1>
+      <hr class="title-divider" />
+    </header>
+    
+    <hr style="border: none; border-top: 1px solid #000000; margin: 0; width: 100%; opacity: 0;" /> 
+    
+    <main class="split-layout">
+      <section class="left-section">
+        <h2>What is a Food Desert?</h2>
+        <p class="definition-box">
+          <strong>USDA Definition:</strong> A census tract qualifies as a food desert if it meets low-income criteria and has limited access to supermarkets—defined as being more than <strong>1 mile</strong> from a supermarket in urban areas, or more than <strong>10 miles</strong> in most rural areas, with up to <strong>20 miles</strong> in particularly remote or sparsely populated rural tracts.
+        </p>
+      </section>
+
+      <section class="right-section">
+        <h2>Living on What's Left: The Everyday Reality of Food Deserts</h2>
+      </section>
+    </main>
+
+    <hr class="section-divider" />
+
+    <section class="geography-section">
+      <p>From One Mile to Twenty: How Geography Expands the Distance to Fresh Food</p>
+    </section>
+
+    <hr class="section-divider" />
+    <main class="split-layout split-layout-top-section">
+      <section class="left-section">
+        <h2>The Epicenters of Food Insecurity</h2>
+        </section>
+
+      <section class="right-section">
+        <h2>The Regional Prevalence of Scarcity</h2>
+        </section>
+    </main>
+
+    <div class="whitespace-section"></div>
+
+    <hr class="section-divider" />
+
+    <section class="new-section-header">
+      <p>The Other Side of Scarcity: Tracking Depression Across America</p>
+    </section>
+    
+    <hr class="section-divider" />
+    <main class="split-layout split-layout-bottom">
+      <section class="left-section" id="depression-bar-chart-container">
+        <h2>The Depression Landscape: America's Most Vulnerable States</h2>
+        </section>
+
+      <section class="right-section" id="depression-map-container">
+        <h2>Regional Patterns of Strain</h2>
+        </section>
+    </main>
+    
+    <hr class="section-divider" />
+    <section class="new-section-header">
+      <p>In the South and Midwest, Scarcity Meets Strain</p>
+    </section>
+    <hr class="section-divider" />
+
+    
+    <div id="map-header">
+        <p>Click on any state to zoom in and explore county-level data</p>
+        <div id="container">
+        <div id="map-container">
+            <button id="reset-button">← Back to US Map</button>
+            <div id="map"></div>
+            <div id="legend"></div>
+        </div>
+        
+        <div id="info-panel" class="hidden">
+            <div class="instruction">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+                <p>Click on a state to view detailed statistics and county-level data</p>
+            </div>
+        </div>
+    </div>
+
+    </div>
+    
+    
+    <hr class="section-divider" />
+    <section class="new-section-header">
+      <p>Communities Leading the Way</p>
+    </section>
+    <hr class="section-divider" />
+
+    <section class="voronoi-instruction">
+      <p>Please click to learn more about and support these community organizations dedicated to improving mental health and reducing the impacts of food deserts</p>
+    </section>
+
+    <div id="voronoi-container"></div>
+
+
+    
+    
+    
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/topojson.v3.min.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
