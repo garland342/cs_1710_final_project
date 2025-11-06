@@ -485,8 +485,437 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     }
+    const spiralContainer = document.getElementById('spiral-container');
+    if (spiralContainer) {
+      createSpiralVisualization('#spiral-container', 'food_access_data.csv');
+    }
+
+    const sliderContainer = document.getElementById('distance-slider-container');
+    if (sliderContainer) {
+      createDistanceSlider('#distance-slider-container', 'food_access_data.csv');
+    }
 
   } else {
     console.log("Page ready. D3 not loaded yet.");
   }
 });
+
+function createSpiralVisualization(containerId, dataPath) {
+  // Private namespace to avoid conflicts
+  const module = {
+    distances: [0.5, 1, 10, 20],
+    a: 8,
+    b: 6,
+    maxMiles: 20,
+    center: { x: 0, y: 0 },
+    viewW: 600,
+    viewH: 520,
+    maxVisualRadius: 200,
+    lastRows: []
+  };
+
+  const container = d3.select(containerId);
+  if (container.empty()) {
+    console.error(`Container ${containerId} not found`);
+    return null;
+  }
+
+  const tooltip = d3.select('body')
+    .append('div')
+    .attr('class', 'spiral-tooltip spiral-hidden')
+    .style('opacity', 0);
+
+  const vizWrap = container.append('div').attr('class', 'spiral-viz-wrap');
+  const viz = vizWrap.append('div').attr('class', 'spiral-viz');
+  const meta = vizWrap.append('aside').attr('class', 'spiral-meta');
+  
+  const dataStatus = meta.append('div').attr('class', 'spiral-data-status').text('Loading data...');
+  const legend = meta.append('div').attr('class', 'spiral-legend');
+  const metaPanel = meta.append('div').attr('class', 'spiral-meta-panel').style('display', 'none');
+
+  const svg = viz.append('svg')
+    .attr('preserveAspectRatio', 'xMidYMid meet')
+    .classed('spiral-svg', true);
+
+  svg.append('path').attr('class', 'spiral-path');
+  const markerGroup = svg.append('g').attr('class', 'spiral-markers');
+
+  const color = d3.scaleLinear().domain([0, module.maxMiles]).range(['#2ca25f', '#de2d26']);
+
+  function radiusToTheta(r) {
+    return (r - module.a) / module.b;
+  }
+
+  function milesToRadius(d) {
+    const minMile = 0.5;
+    const logMin = Math.log10(minMile);
+    const logMax = Math.log10(module.maxMiles);
+    const logD = Math.log10(d);
+    const t = (logD - logMin) / (logMax - logMin);
+    return module.a + t * (module.maxVisualRadius - module.a);
+  }
+
+  function buildSpiralPoints() {
+    const tMax = radiusToTheta(module.maxVisualRadius);
+    const points = [];
+    const steps = Math.max(60, Math.ceil(tMax * 12));
+    for (let i = 0; i <= steps; i++) {
+      const t = (i / steps) * tMax;
+      const r = module.a + module.b * t;
+      const x = module.center.x + r * Math.cos(t);
+      const y = module.center.y + r * Math.sin(t);
+      points.push([x, y]);
+    }
+    return points;
+  }
+
+  function sampleFoodsByDistance(miles) {
+    if (miles <= 2) return ['Fresh fruits', 'Fresh vegetables', 'Whole grains', 'Low-fat dairy'];
+    if (miles <= 10) return ['Fruits', 'Vegetables', 'Canned vegetables', 'Bread', 'Milk'];
+    if (miles <= 20) return ['Processed snacks', 'Soda', 'Canned soups', 'Fast food options'];
+    return ['Mostly convenience store items', 'Packaged snacks', 'Sugary drinks', 'Limited fresh produce'];
+  }
+
+  function chooseLatColumn(miles) {
+    if (miles <= 0.75) return 'LATracts_half';
+    if (miles <= 5) return 'LATracts1';
+    if (miles <= 15) return 'LATracts10';
+    return 'LATracts20';
+  }
+
+  function placeMarkers(rows) {
+    const markers = markerGroup.selectAll('.spiral-marker-g').data(module.distances, d => d);
+    const enter = markers.enter().append('g').attr('class', 'spiral-marker-g');
+    enter.append('circle').attr('class', 'spiral-marker');
+    enter.append('text').attr('class', 'spiral-marker-label').attr('text-anchor', 'middle').attr('dy', -12);
+    enter.append('text').attr('class', 'spiral-marker-badge').attr('text-anchor', 'middle').attr('dy', 12);
+
+    const all = enter.merge(markers);
+    all.each(function (d) {
+      const r = milesToRadius(d);
+      const t = radiusToTheta(r);
+      const x = module.center.x + r * Math.cos(t);
+      const y = module.center.y + r * Math.sin(t);
+      
+      let candidates = [];
+      let col = chooseLatColumn(d);
+      if (rows && rows.length) {
+        candidates = rows.filter(r => {
+          const v = r[col];
+          return v !== undefined && v !== null && v !== '' && +v > 0;
+        });
+      }
+      
+      d3.select(this).attr('transform', `translate(${x},${y})`);
+      d3.select(this).select('circle')
+        .attr('r', Math.max(7, Math.round(module.viewW / 100)))
+        .attr('fill', color(d))
+        .on('mouseenter', (event, dist) => {
+          showTooltip(event, dist, candidates.length ? candidates : rows, candidates.length === 0);
+        })
+        .on('mousemove', (event) => moveTooltip(event))
+        .on('mouseleave', hideTooltip)
+        .on('click', (event) => {
+          showMetaPanel(d, candidates, col);
+        });
+      d3.select(this).select('.spiral-marker-label').text(d + ' mi');
+      d3.select(this).select('.spiral-marker-badge')
+        .text(candidates.length > 0 ? candidates.length : '0')
+        .attr('x', 0)
+        .attr('dy', 12);
+    });
+    markers.exit().remove();
+  }
+
+  function showTooltip(event, miles, rows, isRandom) {
+  let tractInfo = '';
+  if (rows && rows.length && !isRandom) {
+    tractInfo = `<div class="spiral-tooltip-sample"><strong>Matching tracts: ${rows.length}</strong></div>`;
+  }
+
+    const foods = sampleFoodsByDistance(miles).map(f => `<li>${f}</li>`).join('');
+    const html = `<strong>${miles} mile${miles>1?'s':''}</strong>
+      <div class="spiral-small">Typical available food types:</div>
+      <ul class="spiral-tooltip-list">${foods}</ul>
+      ${tractInfo}`;
+  tooltip.html(html).classed('spiral-hidden', false).transition().duration(120).style('opacity', 1);
+  moveTooltip(event);
+}
+
+  function showMetaPanel(distance, candidates, col) {
+    if (candidates.length > 0) {
+      const list = candidates.map(r => `<li>${r.CensusTract || 'n/a'} — ${r.County || ''}, ${r.State || ''}</li>`).join('');
+      metaPanel.html(`<h2>Tracts with limited access (${distance} mi)</h2>
+        <div>Column: <code>${col}</code></div>
+        <div>Matches: <strong>${candidates.length}</strong></div>
+        <ul>${list}</ul>`);
+    } else {
+      metaPanel.html(`<h2>No matching tracts for ${distance} mi</h2>
+        <div>Column: <code>${col}</code></div>
+        <div style="color:#d9534f">No tracts flagged for this distance. Try another marker.</div>`);
+    }
+    metaPanel.style('display', 'block');
+  }
+
+  function moveTooltip(event) {
+    const left = event.pageX + 12;
+    const top = event.pageY + 12;
+    tooltip.style('left', left + 'px').style('top', top + 'px');
+  }
+
+  function hideTooltip() {
+    tooltip.transition().duration(120).style('opacity', 0).on('end', () => tooltip.classed('spiral-hidden', true));
+  }
+
+  function render(rows = module.lastRows) {
+    module.viewW = Math.max(320, viz.node().clientWidth || 600);
+    module.viewH = Math.max(360, viz.node().clientHeight || 520);
+    svg.attr('viewBox', `0 0 ${module.viewW} ${module.viewH}`);
+    module.center = { x: module.viewW / 2, y: module.viewH / 2 };
+    module.maxVisualRadius = Math.min(module.viewW, module.viewH) * 0.45;
+
+    const line = d3.line();
+    svg.select('.spiral-path').attr('d', line(buildSpiralPoints()));
+
+    placeMarkers(rows);
+  }
+
+  d3.csv(dataPath).then(rows => {
+    module.lastRows = rows;
+    dataStatus.text(`Loaded ${rows.length} rows from ${dataPath.split('/').pop()}`);
+    legend.html(`<strong>Dataset</strong><div>Tracts loaded: ${rows.length}</div>
+      <div style="margin-top:6px;color:#555;font-size:13px">Markers show tracts flagged by distance:<ul class="spiral-tooltip-list" style="margin-top:6px"><li>½ mile → <code>LATracts_half</code></li><li>1 mile → <code>LATracts1</code></li><li>10 miles → <code>LATracts10</code></li><li>20 miles → <code>LATracts20</code></li></ul></div>`);
+    render(rows);
+  }).catch(err => {
+    console.warn('CSV load error', err);
+    dataStatus.text('Could not load data — showing concept-only spiral.');
+    render([]);
+  });
+
+  const resizeHandler = () => render();
+  window.addEventListener('resize', resizeHandler);
+
+  setTimeout(() => render(), 60);
+
+  return {
+    render: () => render(),
+    destroy: () => {
+      window.removeEventListener('resize', resizeHandler);
+      tooltip.remove();
+      container.selectAll('*').remove();
+    }
+  };
+}
+
+function createDistanceSlider(containerId, dataPath) {
+  const distances = [0.5, 1, 10, 20];
+  const distanceColumns = {
+    0.5: 'LATracts_half',
+    1: 'LATracts1',
+    10: 'LATracts10',
+    20: 'LATracts20'
+  };
+
+  let currentDistance = 0.5;
+  let currentFilter = 'both'; // 'urban', 'rural', or 'both'
+  let allData = [];
+
+  const container = d3.select(containerId);
+  if (container.empty()) {
+    console.error(`Container ${containerId} not found`);
+    return null;
+  }
+
+  // Create main wrapper
+  const wrapper = container.append('div').attr('class', 'slider-wrapper');
+
+  // Create toggle buttons
+  const toggleContainer = wrapper.append('div').attr('class', 'slider-toggle-container');
+  
+  const urbanBtn = toggleContainer.append('button')
+    .attr('class', 'slider-toggle-btn active')
+    .attr('data-filter', 'both')
+    .text('Both');
+  
+  const ruralBtn = toggleContainer.append('button')
+    .attr('class', 'slider-toggle-btn')
+    .attr('data-filter', 'urban')
+    .text('Urban');
+  
+  const bothBtn = toggleContainer.append('button')
+    .attr('class', 'slider-toggle-btn')
+    .attr('data-filter', 'rural')
+    .text('Rural');
+
+  // Create info display
+  const infoDisplay = wrapper.append('div').attr('class', 'slider-info-display');
+  const tractCount = infoDisplay.append('div').attr('class', 'slider-tract-count').text('0');
+  const tractLabel = infoDisplay.append('div').attr('class', 'slider-tract-label').text('tracts');
+  const distanceLabel = infoDisplay.append('div').attr('class', 'slider-distance-label').text('at 0.5 miles');
+
+  // Create SVG for slider
+  const width = 600;
+  const height = 120;
+  const margin = { top: 20, right: 40, left: 40, bottom: 40 };
+  
+  const svg = wrapper.append('svg')
+    .attr('class', 'slider-svg')
+    .attr('viewBox', `0 0 ${width} ${height}`)
+    .attr('preserveAspectRatio', 'xMidYMid meet');
+
+  const g = svg.append('g')
+    .attr('transform', `translate(${margin.left}, ${margin.top})`);
+
+  const sliderWidth = width - margin.left - margin.right;
+  
+  // Create scale for positioning (logarithmic for better spacing)
+  const xScale = d3.scalePoint()
+    .domain(distances)
+    .range([0, sliderWidth])
+    .padding(0);
+
+  // Draw track line
+  g.append('line')
+    .attr('class', 'slider-track')
+    .attr('x1', 0)
+    .attr('x2', sliderWidth)
+    .attr('y1', 40)
+    .attr('y2', 40);
+
+  // Draw distance markers
+  const markers = g.selectAll('.slider-marker')
+    .data(distances)
+    .join('g')
+    .attr('class', 'slider-marker')
+    .attr('transform', d => `translate(${xScale(d)}, 40)`);
+
+  markers.append('circle')
+    .attr('r', 8)
+    .attr('class', 'slider-marker-circle');
+
+  markers.append('text')
+    .attr('class', 'slider-marker-text')
+    .attr('y', 25)
+    .attr('text-anchor', 'middle')
+    .text(d => d === 0.5 ? '½ mi' : `${d} mi`);
+
+  // Create draggable handle
+  const handle = g.append('g')
+    .attr('class', 'slider-handle')
+    .attr('transform', `translate(${xScale(0.5)}, 40)`)
+    .style('cursor', 'grab');
+
+  handle.append('circle')
+    .attr('r', 15)
+    .attr('class', 'slider-handle-circle');
+
+  handle.append('text')
+    .attr('class', 'slider-handle-text')
+    .attr('text-anchor', 'middle')
+    .attr('dy', 5)
+    .text('½');
+
+  // Drag behavior
+  const drag = d3.drag()
+    .on('start', function() {
+      d3.select(this).style('cursor', 'grabbing');
+    })
+    .on('drag', function(event) {
+      // Find closest distance
+      const mouseX = event.x;
+      let closestDistance = distances[0];
+      let minDiff = Math.abs(xScale(distances[0]) - mouseX);
+      
+      distances.forEach(d => {
+        const diff = Math.abs(xScale(d) - mouseX);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestDistance = d;
+        }
+      });
+      
+      if (closestDistance !== currentDistance) {
+        currentDistance = closestDistance;
+        updateVisualization();
+      }
+    })
+    .on('end', function() {
+      d3.select(this).style('cursor', 'grab');
+    });
+
+  handle.call(drag);
+
+  // Toggle button click handlers
+  toggleContainer.selectAll('.slider-toggle-btn')
+    .on('click', function() {
+      toggleContainer.selectAll('.slider-toggle-btn').classed('active', false);
+      d3.select(this).classed('active', true);
+      currentFilter = d3.select(this).attr('data-filter');
+      updateVisualization();
+    });
+
+  // Filter data based on current settings
+  function getFilteredData() {
+  const column = distanceColumns[currentDistance];
+  
+  return allData.filter(row => {
+    // Check if tract has limited access at this distance
+    const hasLimitedAccess = row[column] && +row[column] > 0;
+    if (!hasLimitedAccess) return false;
+
+    // Apply urban/rural filter
+    if (currentFilter === 'both') return true;
+    
+    const urbanValue = row.Urban !== undefined && row.Urban !== null && row.Urban !== '' ? +row.Urban : null;
+    
+    if (currentFilter === 'urban') return urbanValue === 1;
+    if (currentFilter === 'rural') return urbanValue === 0;
+    
+    return false;
+  });
+}
+
+  // Update visualization based on current state
+  function updateVisualization() {
+    const filteredData = getFilteredData();
+    const count = filteredData.length;
+
+    // Update handle position
+    handle.transition()
+      .duration(300)
+      .attr('transform', `translate(${xScale(currentDistance)}, 40)`);
+
+    // Update handle text
+    handle.select('.slider-handle-text')
+      .text(currentDistance === 0.5 ? '½' : currentDistance === 1 ? '1' : currentDistance);
+
+    // Update info display
+    tractCount.text(count.toLocaleString());
+    
+    const filterText = currentFilter === 'both' ? '' : 
+                      currentFilter === 'urban' ? ' urban' : ' rural';
+    
+    distanceLabel.text(`${filterText} tracts at ${currentDistance === 0.5 ? '½' : currentDistance} mile${currentDistance > 1 ? 's' : ''} from food access`);
+
+    // Update marker highlights
+    markers.selectAll('.slider-marker-circle')
+      .transition()
+      .duration(300)
+      .attr('class', d => d === currentDistance ? 'slider-marker-circle active' : 'slider-marker-circle');
+  }
+
+  // Load data
+  d3.csv(dataPath).then(data => {
+    allData = data;
+    console.log(`Distance slider loaded ${data.length} rows`);
+    updateVisualization();
+  }).catch(err => {
+    console.error('Error loading data for distance slider:', err);
+    tractCount.text('Error');
+    distanceLabel.text('Could not load data');
+  });
+
+  return {
+    update: updateVisualization
+  };
+}
