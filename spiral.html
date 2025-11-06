@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Food Access Spiral — CS 1710 Final Project</title>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+        <header class="page-header">
+            <h1>Food Access Spiral</h1>
+            <p class="subtitle">A conceptual spiral showing distance to grocery stores with food-type popups on hover. Data is partially loaded from <code>food_access_data.csv</code>.</p>
+        </header>
+
+        <main>
+            <section id="viz-wrap">
+                <div id="viz" aria-label="Spiral visualization"></div>
+                        <aside id="meta">
+                            <div id="data-status">Loading data...</div>
+                            <div id="legend"></div>
+                            <div id="meta-panel" style="display:none"></div>
+                        </aside>
+            </section>
+        </main>
+
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="main.js"></script>
+    </body>
+</html>

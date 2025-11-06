@@ -1,0 +1,90 @@
+/* Basic page layout */
+:root{
+	--bg:#fafafa;
+	--muted:#666;
+	--accent:#2b8c5d;
+	--danger:#d9534f;
+	--max-width:1100px;
+}
+html,body{height:100%;}
+body{
+	margin:0;
+	font-family:system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+	background:var(--bg);
+	color:#111;
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+}
+.page-header{max-width:var(--max-width);padding:24px 16px;text-align:center}
+.page-header h1{margin:0 0 6px;font-weight:700}
+.page-header .subtitle{margin:0;color:var(--muted)}
+
+#viz-wrap{display:flex;gap:16px;max-width:var(--max-width);width:100%;padding:12px;align-items:stretch}
+#viz{flex:1 1 auto;background:white;border-radius:8px;box-shadow:0 6px 18px rgba(20,20,20,0.06);min-height:70vh;padding:8px;display:flex}
+#viz svg{width:100%;height:100%;display:block}
+#meta{width:260px;align-self:flex-start}
+
+#data-status{background:#fff8; padding:10px;border-radius:6px;margin-bottom:12px;font-size:14px}
+#legend{background:#fff8;padding:10px;border-radius:6px}
+
+/* Tooltip */
+.tooltip{
+	position: absolute;
+	pointer-events: none;
+	background: white;
+	border:1px solid rgba(0,0,0,0.12);
+	padding:8px 10px;
+	border-radius:6px;
+	box-shadow:0 6px 18px rgba(0,0,0,0.08);
+	font-size:13px;
+	color:#111;
+	max-width:320px;
+}
+.tooltip.hidden{display:none}
+
+.tooltip .small{color:var(--muted);font-size:12px;margin-top:4px}
+.tooltip .tooltip-list{margin:6px 0 0 16px;padding:0}
+.tooltip .tooltip-list li{margin:2px 0}
+.tooltip .tooltip-sample{margin-top:6px;font-size:12px;color:#444}
+
+/* Spiral elements */
+.spiral-path{fill:none;stroke:#ddd;stroke-width:10;stroke-linecap:round;opacity:0.9}
+.marker{stroke:#fff;stroke-width:1.5;cursor:pointer}
+.marker-label{font-size:11px;fill:#222}
+
+.marker-badge {
+	font-size: 11px;
+	font-weight: 700;
+	fill: var(--accent);
+	stroke: #fff;
+	stroke-width: 0.5;
+	paint-order: stroke;
+	text-anchor: middle;
+	dominant-baseline: middle;
+}
+
+#meta-panel {
+	background: #fff;
+	border-radius: 8px;
+	box-shadow: 0 6px 18px rgba(20,20,20,0.06);
+	padding: 16px;
+	margin-top: 12px;
+	font-size: 14px;
+	max-height: 60vh;
+	overflow-y: auto;
+}
+#meta-panel h2 {
+	margin: 0 0 8px 0;
+	font-size: 16px;
+}
+#meta-panel ul {
+	margin: 8px 0 0 0;
+	padding: 0 0 0 18px;
+}
+
+/* small screens */
+@media (max-width:880px){
+	#viz-wrap{flex-direction:column}
+	#meta{width:100%}
+}
