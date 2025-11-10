@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .domain([0, d3.max(data, d => d.tracts) * 1.1])
         .range([height, 0]);
 
-      // Add bars
+      // Add bars with purple gradient
       const bars = svg.selectAll(".bar")
         .data(data)
         .join("rect")
@@ -122,15 +122,16 @@ document.addEventListener("DOMContentLoaded", () => {
         .attr("y", d => y(d.tracts))
         .attr("width", x.bandwidth())
         .attr("height", d => height - y(d.tracts))
-        .attr("fill", "#2d5016")
-        .style("cursor", "pointer");
+        .attr("fill", "#667eea")
+        .style("cursor", "pointer")
+        .style("transition", "all 0.2s ease");
       
       // Create tooltip text element for hover values - append after bars to bring to front
       const tooltip = svg.append("text")
         .attr("class", "bar-tooltip")
         .style("font-size", "12px")
         .style("font-weight", "bold")
-        .style("fill", "#000")
+        .style("fill", "#2c3e50")
         .style("text-anchor", "middle")
         .style("opacity", 0)
         .style("pointer-events", "none")
@@ -139,8 +140,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // Add hover handlers to bars for tooltip
       bars
         .on("mouseover", function(event, d) {
-          // Change bar to lighter green
-          d3.select(this).attr("fill", "#5a8a3a");
+          // Change bar to darker purple
+          d3.select(this).attr("fill", "#764ba2");
           // Show tooltip
           tooltip
             .attr("x", x(d.state) + x.bandwidth() / 2)
@@ -150,8 +151,8 @@ document.addEventListener("DOMContentLoaded", () => {
             .raise(); // Bring to front
         })
         .on("mouseout", function() {
-          // Change bar back to original green
-          d3.select(this).attr("fill", "#2d5016");
+          // Change bar back to original purple
+          d3.select(this).attr("fill", "#667eea");
           // Hide tooltip
           tooltip.style("opacity", 0);
         });
@@ -163,27 +164,30 @@ document.addEventListener("DOMContentLoaded", () => {
         .selectAll("text")
         .attr("transform", "rotate(-45)")
         .style("text-anchor", "end")
-        .style("font-size", "10px");
+        .style("font-size", "10px")
+        .style("fill", "#2c3e50");
 
       // Add x-axis label
       svg.append("text")
         .attr("x", width / 2)
         .attr("y", height + 70)
-        .attr("fill", "black")
+        .attr("fill", "#2c3e50")
         .style("text-anchor", "middle")
         .style("font-size", "12px")
         .text("State");
 
       // Add y-axis
       svg.append("g")
-        .call(d3.axisLeft(y));
+        .call(d3.axisLeft(y))
+        .selectAll("text")
+        .style("fill", "#2c3e50");
 
       // Add y-axis label
       svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", -65)
         .attr("x", -height / 2)
-        .attr("fill", "black")
+        .attr("fill", "#2c3e50")
         .style("text-anchor", "middle")
         .style("font-size", "12px")
         .text("Number of Low Income Low Access Tracts");
@@ -223,7 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .domain([0, d3.max(data, d => d.tracts) * 1.1])
         .range([height, 0]);
 
-      // Add bars with dark green color
+      // Add bars with purple gradient
       const bars = svg.selectAll(".bar")
         .data(data)
         .join("rect")
@@ -232,15 +236,16 @@ document.addEventListener("DOMContentLoaded", () => {
         .attr("y", d => y(d.tracts))
         .attr("width", x.bandwidth())
         .attr("height", d => height - y(d.tracts))
-        .attr("fill", "#2d5016")
-        .style("cursor", "pointer");
+        .attr("fill", "#667eea")
+        .style("cursor", "pointer")
+        .style("transition", "all 0.2s ease");
       
       // Create tooltip text element for hover values - append after bars to bring to front
       const tooltip = svg.append("text")
         .attr("class", "bar-tooltip")
         .style("font-size", "12px")
         .style("font-weight", "bold")
-        .style("fill", "#000")
+        .style("fill", "#2c3e50")
         .style("text-anchor", "middle")
         .style("opacity", 0)
         .style("pointer-events", "none")
@@ -249,8 +254,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // Add hover handlers to bars
       bars
         .on("mouseover", function(event, d) {
-          // Change bar to lighter green
-          d3.select(this).attr("fill", "#5a8a3a");
+          // Change bar to darker purple
+          d3.select(this).attr("fill", "#764ba2");
           // Show tooltip
           tooltip
             .attr("x", x(d.region) + x.bandwidth() / 2)
@@ -260,8 +265,8 @@ document.addEventListener("DOMContentLoaded", () => {
             .raise(); // Bring to front
         })
         .on("mouseout", function() {
-          // Change bar back to original green
-          d3.select(this).attr("fill", "#2d5016");
+          // Change bar back to original purple
+          d3.select(this).attr("fill", "#667eea");
           // Hide tooltip
           tooltip.style("opacity", 0);
         });
@@ -272,27 +277,30 @@ document.addEventListener("DOMContentLoaded", () => {
         .call(d3.axisBottom(x))
         .selectAll("text")
         .style("text-anchor", "middle")
-        .style("font-size", "11px");
+        .style("font-size", "11px")
+        .style("fill", "#2c3e50");
 
       // Add x-axis label
       svg.append("text")
         .attr("x", width / 2)
         .attr("y", height + 60)
-        .attr("fill", "black")
+        .attr("fill", "#2c3e50")
         .style("text-anchor", "middle")
         .style("font-size", "12px")
         .text("Region");
 
       // Add y-axis
       svg.append("g")
-        .call(d3.axisLeft(y));
+        .call(d3.axisLeft(y))
+        .selectAll("text")
+        .style("fill", "#2c3e50");
 
       // Add y-axis label
       svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", -65)
         .attr("x", -height / 2)
-        .attr("fill", "black")
+        .attr("fill", "#2c3e50")
         .style("text-anchor", "middle")
         .style("font-size", "12px")
         .text("Number of Food Desert Tracts");
@@ -351,7 +359,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .domain([0, maxValue])
         .range([height, 0]);
 
-      // Add bars with dark purple color
+      // Add bars with purple gradient
       const bars = svg.selectAll(".bar")
         .data(data)
         .join("rect")
@@ -360,15 +368,16 @@ document.addEventListener("DOMContentLoaded", () => {
         .attr("y", d => y(d[yKey]))
         .attr("width", x.bandwidth())
         .attr("height", d => height - y(d[yKey]))
-        .attr("fill", "#4a235a")
-        .style("cursor", "pointer");
+        .attr("fill", "#667eea")
+        .style("cursor", "pointer")
+        .style("transition", "all 0.2s ease");
       
       // Create tooltip text element for hover values - append after bars to bring to front
       const tooltip = svg.append("text")
         .attr("class", "bar-tooltip")
         .style("font-size", "12px")
         .style("font-weight", "bold")
-        .style("fill", "#000")
+        .style("fill", "#2c3e50")
         .style("text-anchor", "middle")
         .style("opacity", 0)
         .style("pointer-events", "none")
@@ -377,8 +386,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // Add hover handlers to bars
       bars
         .on("mouseover", function(event, d) {
-          // Change bar to lighter purple
-          d3.select(this).attr("fill", "#7a4a8a");
+          // Change bar to darker purple
+          d3.select(this).attr("fill", "#764ba2");
           // Show tooltip
           const value = d[yKey];
           tooltip
@@ -390,7 +399,7 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .on("mouseout", function() {
           // Change bar back to original purple
-          d3.select(this).attr("fill", "#4a235a");
+          d3.select(this).attr("fill", "#667eea");
           // Hide tooltip
           tooltip.style("opacity", 0);
         });
@@ -399,13 +408,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (containerSelector === "#depression-bar-chart-container") {
         const nationalAvg = 22.5;
         
-        // Draw red dotted line
+        // Draw line with black accent
         svg.append("line")
           .attr("x1", 0)
           .attr("x2", width)
           .attr("y1", y(nationalAvg))
           .attr("y2", y(nationalAvg))
-          .attr("stroke", "red")
+          .attr("stroke", "#000000")
           .attr("stroke-width", 2)
           .attr("stroke-dasharray", "5,5");
         
@@ -413,16 +422,16 @@ document.addEventListener("DOMContentLoaded", () => {
         svg.append("text")
           .attr("x", width + 5)
           .attr("y", y(nationalAvg) + 5)
-          .attr("fill", "red")
+          .attr("fill", "#000000")
           .style("font-size", "11px")
           .style("font-weight", "bold")
           .text("Nationwide Average");
         
-        // Add percentage below Nationwide Average in red
+        // Add percentage below Nationwide Average in black
         svg.append("text")
           .attr("x", width + 5)
           .attr("y", y(nationalAvg) + 20)
-          .attr("fill", "red")
+          .attr("fill", "#000000")
           .style("font-size", "11px")
           .style("font-weight", "bold")
           .text("22.5%");
@@ -435,27 +444,30 @@ document.addEventListener("DOMContentLoaded", () => {
         .selectAll("text")
         .attr("transform", "rotate(-45)")
         .style("text-anchor", "end")
-        .style("font-size", "10px");
+        .style("font-size", "10px")
+        .style("fill", "#2c3e50");
 
       // Add x-axis label
       svg.append("text")
         .attr("x", width / 2)
         .attr("y", height + 70)
-        .attr("fill", "black")
+        .attr("fill", "#2c3e50")
         .style("text-anchor", "middle")
         .style("font-size", "12px")
         .text(containerSelector === "#depression-bar-chart-container" ? "States" : "Region");
 
       // Add y-axis
       svg.append("g")
-        .call(d3.axisLeft(y));
+        .call(d3.axisLeft(y))
+        .selectAll("text")
+        .style("fill", "#2c3e50");
 
       // Add y-axis label - push down more to prevent "Years" from cutting off
       svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", -60)
         .attr("x", -height / 2)
-        .attr("fill", "black")
+        .attr("fill", "#2c3e50")
         .style("text-anchor", "middle")
         .style("font-size", "11px")
         .text(containerSelector === "#depression-bar-chart-container" 
@@ -527,7 +539,7 @@ document.addEventListener("DOMContentLoaded", () => {
     cellGroups.append("path")
       .attr("d", d => "M" + d.polygon.join("L") + "Z")
       .attr("fill", (d, i) => d3.schemeCategory10[i % 10]) 
-      .attr("stroke", "#333")
+      .attr("stroke", "#ccc")
       .attr("stroke-width", 1)
       .attr("opacity", 0.7)
       .attr("class", "voronoi-path")
