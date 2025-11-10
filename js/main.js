@@ -610,12 +610,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     const spiralContainer = document.getElementById('spiral-container');
     if (spiralContainer) {
-      createSpiralVisualization('#spiral-container', 'food_access.csv');
+      createSpiralVisualization('#spiral-container', 'data/food_access.csv');
     }
 
     const sliderContainer = document.getElementById('distance-slider-container');
     if (sliderContainer) {
-      createDistanceSlider('#distance-slider-container', 'food_access.csv');
+      createDistanceSlider('#distance-slider-container', 'data/food_access.csv');
     }
 
   } else {
