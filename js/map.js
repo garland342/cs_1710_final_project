@@ -331,7 +331,7 @@ function createLegend(colorScale, values) {
     const legendContainer = d3.select("#legend");
     legendContainer.html("");
     
-    legendContainer.append("h4").text("Color Scale");
+    legendContainer.append("h4").text("Food Insecurity Crude Prevalence");
     
     const legendSvg = legendContainer.append("svg")
         .attr("width", 300)
