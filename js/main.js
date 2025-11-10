@@ -35,18 +35,18 @@ document.addEventListener("DOMContentLoaded", () => {
     ];
 
     const depressionRegionData = [
-      { region: "South", value: 23.5 },
-      { region: "Midwest", value: 21.8 },
-      { region: "West", value: 19.6 },
-      { region: "Northeast", value: 18.4 }
+      { region: "South", value: 22.94 },
+      { region: "Midwest", value: 22.8 },
+      { region: "West", value: 22.39 },
+      { region: "Northeast", value: 20.92 }
     ];
 
     // Regional food desert data
     const foodDesertRegionData = [
-      { region: "South", tracts: 2850 },
-      { region: "Midwest", tracts: 1920 },
-      { region: "West", tracts: 1650 },
-      { region: "Northeast", tracts: 980 }
+      { region: "South", tracts: 7616 },
+      { region: "Midwest", tracts: 4736 },
+      { region: "West", tracts: 4064 },
+      { region: "Northeast", tracts: 2310 }
     ];
 
     // Create food desert tracts bar chart in the top left section
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .attr("class", "chart-title")
         .style("font-size", "1.1rem")
         .style("font-weight", "bold")
-        .style("margin-bottom", "15px")
+        .style("margin-bottom", "5px")
         .style("text-align", "center")
         .text("Top 10 States with the Highest Number of Low-Income Low Access Tracts");
       
@@ -114,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .range([height, 0]);
 
       // Add bars
-      svg.selectAll(".bar")
+      const bars = svg.selectAll(".bar")
         .data(data)
         .join("rect")
         .attr("class", "bar")
@@ -122,7 +122,39 @@ document.addEventListener("DOMContentLoaded", () => {
         .attr("y", d => y(d.tracts))
         .attr("width", x.bandwidth())
         .attr("height", d => height - y(d.tracts))
-        .attr("fill", "#2d5016");
+        .attr("fill", "#2d5016")
+        .style("cursor", "pointer");
+      
+      // Create tooltip text element for hover values - append after bars to bring to front
+      const tooltip = svg.append("text")
+        .attr("class", "bar-tooltip")
+        .style("font-size", "12px")
+        .style("font-weight", "bold")
+        .style("fill", "#000")
+        .style("text-anchor", "middle")
+        .style("opacity", 0)
+        .style("pointer-events", "none")
+        .style("z-index", 1000);
+      
+      // Add hover handlers to bars for tooltip
+      bars
+        .on("mouseover", function(event, d) {
+          // Change bar to lighter green
+          d3.select(this).attr("fill", "#5a8a3a");
+          // Show tooltip
+          tooltip
+            .attr("x", x(d.state) + x.bandwidth() / 2)
+            .attr("y", y(d.tracts) - 5)
+            .text(`(${d.tracts.toLocaleString()})`)
+            .style("opacity", 1)
+            .raise(); // Bring to front
+        })
+        .on("mouseout", function() {
+          // Change bar back to original green
+          d3.select(this).attr("fill", "#2d5016");
+          // Hide tooltip
+          tooltip.style("opacity", 0);
+        });
 
       // Add x-axis
       svg.append("g")
@@ -192,7 +224,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .range([height, 0]);
 
       // Add bars with dark green color
-      svg.selectAll(".bar")
+      const bars = svg.selectAll(".bar")
         .data(data)
         .join("rect")
         .attr("class", "bar")
@@ -200,7 +232,39 @@ document.addEventListener("DOMContentLoaded", () => {
         .attr("y", d => y(d.tracts))
         .attr("width", x.bandwidth())
         .attr("height", d => height - y(d.tracts))
-        .attr("fill", "#2d5016");
+        .attr("fill", "#2d5016")
+        .style("cursor", "pointer");
+      
+      // Create tooltip text element for hover values - append after bars to bring to front
+      const tooltip = svg.append("text")
+        .attr("class", "bar-tooltip")
+        .style("font-size", "12px")
+        .style("font-weight", "bold")
+        .style("fill", "#000")
+        .style("text-anchor", "middle")
+        .style("opacity", 0)
+        .style("pointer-events", "none")
+        .style("z-index", 1000);
+      
+      // Add hover handlers to bars
+      bars
+        .on("mouseover", function(event, d) {
+          // Change bar to lighter green
+          d3.select(this).attr("fill", "#5a8a3a");
+          // Show tooltip
+          tooltip
+            .attr("x", x(d.region) + x.bandwidth() / 2)
+            .attr("y", y(d.tracts) - 5)
+            .text(`(${d.tracts.toLocaleString()})`)
+            .style("opacity", 1)
+            .raise(); // Bring to front
+        })
+        .on("mouseout", function() {
+          // Change bar back to original green
+          d3.select(this).attr("fill", "#2d5016");
+          // Hide tooltip
+          tooltip.style("opacity", 0);
+        });
 
       // Add x-axis
       svg.append("g")
@@ -213,7 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Add x-axis label
       svg.append("text")
         .attr("x", width / 2)
-        .attr("y", height + 50)
+        .attr("y", height + 60)
         .attr("fill", "black")
         .style("text-anchor", "middle")
         .style("font-size", "12px")
@@ -243,9 +307,22 @@ document.addEventListener("DOMContentLoaded", () => {
           .attr("class", "chart-title")
           .style("font-size", "1.1rem")
           .style("font-weight", "bold")
-          .style("margin-bottom", "15px")
+          .style("margin-bottom", "5px")
           .style("text-align", "center")
           .text("Top 10 States with Highest Proportion of Depressed Individuals");
+      }
+      
+      // Add title for the regional chart (right side) to match format
+      if (containerSelector === "#depression-map-container") {
+        // Remove the existing chart-subtitle from HTML and add it here with same styling
+        container.select(".chart-subtitle").remove();
+        container.append("p")
+          .attr("class", "chart-title")
+          .style("font-size", "1.1rem")
+          .style("font-weight", "bold")
+          .style("margin-bottom", "5px")
+          .style("text-align", "center")
+          .text("Regional Distribution of Depression Prevalence");
       }
       
       // Set dimensions with extra right margin for the label
@@ -266,12 +343,16 @@ document.addEventListener("DOMContentLoaded", () => {
         .range([0, width])
         .padding(0.2);
 
+      // Adjust y-axis: start at 0 but use a tighter max to emphasize differences
+      // For regional chart, use 25 as max to make South and Midwest appear worse
+      // For states chart, keep 35 to accommodate higher state values
+      const maxValue = containerSelector === "#depression-map-container" ? 25 : 35;
       const y = d3.scaleLinear()
-        .domain([0, 35])
+        .domain([0, maxValue])
         .range([height, 0]);
 
       // Add bars with dark purple color
-      svg.selectAll(".bar")
+      const bars = svg.selectAll(".bar")
         .data(data)
         .join("rect")
         .attr("class", "bar")
@@ -279,7 +360,40 @@ document.addEventListener("DOMContentLoaded", () => {
         .attr("y", d => y(d[yKey]))
         .attr("width", x.bandwidth())
         .attr("height", d => height - y(d[yKey]))
-        .attr("fill", "#4a235a");
+        .attr("fill", "#4a235a")
+        .style("cursor", "pointer");
+      
+      // Create tooltip text element for hover values - append after bars to bring to front
+      const tooltip = svg.append("text")
+        .attr("class", "bar-tooltip")
+        .style("font-size", "12px")
+        .style("font-weight", "bold")
+        .style("fill", "#000")
+        .style("text-anchor", "middle")
+        .style("opacity", 0)
+        .style("pointer-events", "none")
+        .style("z-index", 1000);
+      
+      // Add hover handlers to bars
+      bars
+        .on("mouseover", function(event, d) {
+          // Change bar to lighter purple
+          d3.select(this).attr("fill", "#7a4a8a");
+          // Show tooltip
+          const value = d[yKey];
+          tooltip
+            .attr("x", x(d[xKey]) + x.bandwidth() / 2)
+            .attr("y", y(d[yKey]) - 5)
+            .text(`(${value.toFixed(2)}%)`)
+            .style("opacity", 1)
+            .raise(); // Bring to front
+        })
+        .on("mouseout", function() {
+          // Change bar back to original purple
+          d3.select(this).attr("fill", "#4a235a");
+          // Hide tooltip
+          tooltip.style("opacity", 0);
+        });
 
       // Add nationwide average line (only for states chart)
       if (containerSelector === "#depression-bar-chart-container") {
@@ -297,12 +411,21 @@ document.addEventListener("DOMContentLoaded", () => {
         
         // Add label outside the graph
         svg.append("text")
-          .attr("x", width + 10)
+          .attr("x", width + 5)
           .attr("y", y(nationalAvg) + 5)
           .attr("fill", "red")
           .style("font-size", "11px")
           .style("font-weight", "bold")
           .text("Nationwide Average");
+        
+        // Add percentage below Nationwide Average in red
+        svg.append("text")
+          .attr("x", width + 5)
+          .attr("y", y(nationalAvg) + 20)
+          .attr("fill", "red")
+          .style("font-size", "11px")
+          .style("font-weight", "bold")
+          .text("22.5%");
       }
 
       // Add x-axis
@@ -321,16 +444,16 @@ document.addEventListener("DOMContentLoaded", () => {
         .attr("fill", "black")
         .style("text-anchor", "middle")
         .style("font-size", "12px")
-        .text(containerSelector === "#depression-bar-chart-container" ? "States" : xKey);
+        .text(containerSelector === "#depression-bar-chart-container" ? "States" : "Region");
 
       // Add y-axis
       svg.append("g")
         .call(d3.axisLeft(y));
 
-      // Add y-axis label
+      // Add y-axis label - push down more to prevent "Years" from cutting off
       svg.append("text")
         .attr("transform", "rotate(-90)")
-        .attr("y", -70)
+        .attr("y", -60)
         .attr("x", -height / 2)
         .attr("fill", "black")
         .style("text-anchor", "middle")

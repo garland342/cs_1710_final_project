@@ -397,9 +397,36 @@ h1 {
   min-height: 600px;
 }
 
-/* Extra space below h2 in bottom section */
+/* Reduce space below h2 in bottom section */
 .split-layout-bottom h2 {
-  margin-bottom: 60px;
+  margin-bottom: 15px;
+}
+
+/* Push everything in depression-map-container down */
+#depression-map-container {
+  padding-top: 100px;
+}
+
+/* Push Regional Patterns of Strain h2 up to align with left side */
+#depression-map-container h2 {
+  margin-top: -70px;
+}
+
+/* Keep chart title in normal flow */
+#depression-map-container .chart-title {
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+
+/* Keep bar graph in normal position */
+#depression-map-container svg {
+  margin-top: 0;
+}
+
+/* Ensure both depression chart containers have same structure */
+#depression-bar-chart-container .chart-title {
+  margin-top: 0;
+  margin-bottom: 5px;
 }
 
 /* Class for the new Food Desert section */
@@ -407,6 +434,21 @@ h1 {
     margin-top: 0;
     min-height: 600px;
     position: relative;
+}
+
+/* Make h2 spacing consistent in top section for level bar graphs */
+.split-layout-top-section h2 {
+  margin-bottom: 15px;
+}
+
+/* Push the left chart up to align with right chart */
+.split-layout-top-section .left-section svg {
+  margin-top: -10px;
+}
+
+/* Push the right chart (Regional Distribution of Food Desert Tracts) down slightly */
+.split-layout-top-section .right-section svg {
+  margin-top: 20px;
 }
 
 /* Add an overlay border that definitely stretches full height */
@@ -472,8 +514,10 @@ h1 {
   align-items: center;
 }
 
-/* Vertical divider between the two sides */
+/* Push left section content more to the left */
 .left-section {
+  padding-left: 10px;
+  padding-right: 60px;
   border-right: none;
   text-align: center;
 }
@@ -494,10 +538,13 @@ h1 {
   border: 2px solid #000000;
   padding: 15px;
   margin-bottom: 20px;
+  margin-top: 30px;
   border-radius: 5px;
   text-align: left !important;
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   line-height: 1.6;
+  margin-left: -10px;
+  margin-right: 0;
 }
 
 /* Headings and text */
@@ -506,6 +553,21 @@ h2 {
   margin-top: 0; 
   margin-bottom: 40px;
   color: #000000;
+}
+
+/* Reduce space below h2 in right section for spiral */
+.right-section h2 {
+  margin-bottom: 15px;
+}
+
+/* Make h2 spacing consistent in first split-layout section */
+.split-layout:not(.split-layout-top-section):not(.split-layout-bottom) .left-section h2 {
+  margin-bottom: 15px;
+}
+
+/* Push left section content down slightly in first split-layout */
+.split-layout:not(.split-layout-top-section):not(.split-layout-bottom) .left-section {
+  padding-top: 40px;
 }
 
 p, li {
@@ -596,6 +658,11 @@ p, li {
   width: 100%;
   height: 100%;
   display: block;
+}
+
+/* Move spiral up */
+#spiral-container {
+  margin-top: -45px;
 }
 
 .spiral-meta {
@@ -864,4 +931,31 @@ p, li {
     padding: 8px 16px;
     font-size: 13px;
   }
+}
+
+/* Chart title styling */
+.chart-title {
+  font-size: 1.1rem !important;
+  font-weight: bold !important;
+  margin-bottom: 5px !important;
+  text-align: center !important;
+}
+
+/* Chart subtitle - make it match chart-title */
+.chart-subtitle {
+  font-size: 1.1rem !important;
+  font-weight: bold !important;
+  margin-bottom: 5px !important;
+  text-align: center !important;
+  margin-top: 0 !important;
+}
+
+/* Map header center alignment */
+#map-header {
+  text-align: center;
+}
+
+#map-header p {
+  text-align: center;
+  margin: 0;
 }
