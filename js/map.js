@@ -14,11 +14,11 @@ const COUNTY_METRICS = [
     { value: "FOODINSECU_CrudePrev", label: "Unadjusted Rate of Food Insecurity (%)", format: ".2f", colorScheme: d3.interpolateBlues},
     { value: "DIABETES_CrudePrev", label: "Unadjusted Rate of Diabetes (%)", format: ".2f", colorScheme: d3.interpolateReds },
     { value: "DEPRESSION_CrudePrev", label: "Unadjusted Rate of Depression (%)", format: ".2f", colorScheme: d3.interpolatePurples },
-    { value: "MHLTH_CrudePrev", label: "Unadjusted Rate of Mental Illness (%)", format: ".2f", colorScheme: d3.interpolateGreens }
+    { value: "BPHIGH_CrudePrev", label: "Unadjusted Rate of High Blood Pressure (%)", format: ".2f", colorScheme: d3.interpolateGreens }
 ];
 
 const ADDITIONAL_VARIABLES = [
-    { column: "MHLTH_CrudePrev", label: "Mental Health Crude Prevalence", format: ",.0f", aggregate: "mean" },
+    { column: "BPHIGH_CrudePrev", label: "High Blood Pressure Crude Prevalence", format: ",.0f", aggregate: "mean" },
     { column: "DIABETES_CrudePrev", label: "Diabetes Crude Prevalence", format: ".0f", aggregate: "mean" },
     { column: "DEPRESSION_CrudePrev", label: "Depression Crude Prevalence", format: ".2f", aggregate: "mean" },
 ];
@@ -738,7 +738,7 @@ Promise.all([
                 : stateName || "No data";
         });
     
-    createLegend(colorScale, values, "Food Insecurity Crude Prevalence");
+    createLegend(colorScale, values, "Unadjusted Rate of Food Insecurity (%)");
     
     d3.select("#reset-button").on("click", function() {
         resetZoom(stateFeatures, stateAverages, colorScale);
