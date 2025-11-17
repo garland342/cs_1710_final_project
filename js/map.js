@@ -622,7 +622,7 @@ function createCountyDistributionChart(container, stateData, metric) {
 // LEGEND FUNCTION
 // ============================================
 
-function createLegend(colorScale, values, title = "Food Insecurity Crude Prevalence") {
+function createLegend(colorScale, values, title = "Unadjusted Rate of Food Insecurity (%)") {
     const legendContainer = d3.select("#legend");
     legendContainer.html("");
     
