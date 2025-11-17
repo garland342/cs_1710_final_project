@@ -2,12 +2,20 @@
 // CONFIGURATION - CHANGE THESE VALUES
 // ============================================
 
-const CSV_FILE = "data/health_data_v2.csv";
+const CSV_FILE = "data/agg_health.csv";
 const VARIABLE_NAME = "FOODINSECU_CrudePrev";
 const STATE_COLUMN = "StateDesc";
 const COUNTY_COLUMN = "CountyName";
 const MAP_TITLE = "US State Map: Average by State";
 const COLOR_SCHEME = d3.interpolateBlues;
+
+// Metrics available for county-level view
+const COUNTY_METRICS = [
+    { value: "FOODINSECU_CrudePrev", label: "Unadjusted Rate of Food Insecurity (%)", format: ".2f", colorScheme: d3.interpolateBlues},
+    { value: "DIABETES_CrudePrev", label: "Unadjusted Rate of Diabetes (%)", format: ".2f", colorScheme: d3.interpolateReds },
+    { value: "DEPRESSION_CrudePrev", label: "Unadjusted Rate of Depression (%)", format: ".2f", colorScheme: d3.interpolatePurples },
+    { value: "MHLTH_CrudePrev", label: "Unadjusted Rate of Mental Illness (%)", format: ".2f", colorScheme: d3.interpolateGreens }
+];
 
 const ADDITIONAL_VARIABLES = [
     { column: "MHLTH_CrudePrev", label: "Mental Health Crude Prevalence", format: ",.0f", aggregate: "mean" },
@@ -42,6 +50,10 @@ d3.select("#title").text(MAP_TITLE);
 
 let currentState = null;
 let isZoomed = false;
+let currentMetric = COUNTY_METRICS[0].value; // Default to Diabetes
+let currentStateData = null;
+let currentCountyFeatures = null;
+let currentStateFeature = null;
 
 // ============================================
 // FIPS TO STATE NAME MAPPING
@@ -100,6 +112,122 @@ function calculateStatistic(data, column, aggregateType) {
     }
 }
 
+function getMetricLabel(metricValue) {
+    const metric = COUNTY_METRICS.find(m => m.value === metricValue);
+    return metric ? metric.label : metricValue;
+}
+
+function getMetricFormat(metricValue) {
+    const metric = COUNTY_METRICS.find(m => m.value === metricValue);
+    return metric ? metric.format : ".2f";
+}
+
+function getMetricColorScheme(metricValue) {
+    const metric = COUNTY_METRICS.find(m => m.value === metricValue);
+    return metric ? metric.colorScheme : d3.interpolateBlues;
+}
+
+// ============================================
+// METRIC CHANGE HANDLER
+// ============================================
+
+function onMetricChange(newMetric) {
+    currentMetric = newMetric;
+    
+    if (isZoomed && currentStateData && currentCountyFeatures && currentStateFeature) {
+        // Update county colors and legend
+        updateCountyColors(currentStateData, currentCountyFeatures);
+        updateLegendForMetric(currentMetric, currentStateData);
+        
+        // Update distribution chart
+        const chartContainer = d3.select("#county-distribution-chart");
+        if (!chartContainer.empty()) {
+            createCountyDistributionChart(chartContainer, currentStateData, currentMetric);
+        }
+        
+        // Update primary statistics
+        updatePrimaryStatistics(currentStateData, currentMetric);
+    }
+}
+
+function updatePrimaryStatistics(stateData, metric) {
+    const values = stateData.map(d => +d[metric]).filter(v => !isNaN(v));
+    const formatStr = getMetricFormat(metric);
+    
+    d3.select(".stat-grid .stat-card:nth-child(1) .stat-value")
+        .text(formatValue(d3.mean(values), formatStr));
+    d3.select(".stat-grid .stat-card:nth-child(2) .stat-value")
+        .text(formatValue(d3.min(values), formatStr));
+    d3.select(".stat-grid .stat-card:nth-child(3) .stat-value")
+        .text(formatValue(d3.max(values), formatStr));
+    d3.select(".stat-grid .stat-card:nth-child(4) .stat-value")
+        .text(formatValue(d3.median(values), formatStr));
+}
+
+function updateCountyColors(stateData, countyFeatures) {
+    // Calculate color scale for current metric using metric-specific color scheme
+    const values = stateData.map(d => +d[currentMetric]).filter(v => !isNaN(v));
+    const colorScale = d3.scaleSequential()
+        .domain(d3.extent(values))
+        .interpolator(getMetricColorScheme(currentMetric));
+    
+    const stateFips = nameToFips.get(currentState);
+    const stateCounties = countyFeatures.features.filter(d => {
+        return d.id.substring(0, 2) === stateFips;
+    });
+    
+    const countyDataMap = new Map();
+    stateData.forEach(d => {
+        const normalizedName = (d[COUNTY_COLUMN] || "").toLowerCase().replace(/\s+county\s*$/i, '').trim();
+        countyDataMap.set(normalizedName, d);
+    });
+    
+    // Update existing county paths
+    countyGroup.selectAll("path.county")
+        .transition()
+        .duration(500)
+        .attr("fill", d => {
+            const countyTopoName = d.properties && d.properties.name ? d.properties.name.toLowerCase() : '';
+            let matchingData = null;
+            
+            for (let [normalizedName, data] of countyDataMap) {
+                if (countyTopoName.includes(normalizedName) || normalizedName.includes(countyTopoName)) {
+                    matchingData = data;
+                    break;
+                }
+            }
+            
+            if (!matchingData) {
+                matchingData = stateData.find(cd => {
+                    const dataCountyName = (cd[COUNTY_COLUMN] || "").toLowerCase().replace(/\s+county\s*$/i, '').trim();
+                    return countyTopoName.includes(dataCountyName) || dataCountyName.includes(countyTopoName);
+                });
+            }
+            
+            if (matchingData) {
+                const value = +matchingData[currentMetric];
+                return isNaN(value) ? "#e0e0e0" : colorScale(value);
+            }
+            return "#e0e0e0";
+        });
+    
+    // Update tooltips
+    countyGroup.selectAll("path.county")
+        .select("title")
+        .text(d => {
+            return getCountyTooltipText(d, stateData);
+        });
+}
+
+function updateLegendForMetric(metric, stateData) {
+    const values = stateData.map(d => +d[metric]).filter(v => !isNaN(v));
+    const colorScale = d3.scaleSequential()
+        .domain(d3.extent(values))
+        .interpolator(getMetricColorScheme(metric));
+    
+    createLegend(colorScale, values, getMetricLabel(metric));
+}
+
 // ============================================
 // ZOOM FUNCTIONS
 // ============================================
@@ -107,6 +235,12 @@ function calculateStatistic(data, column, aggregateType) {
 function zoomToState(stateFeature, stateName, stateData, countyFeatures, colorScale) {
     isZoomed = true;
     currentState = stateName;
+    currentStateData = stateData;
+    currentCountyFeatures = countyFeatures;
+    currentStateFeature = stateFeature;
+    
+    // Keep regional graph panel visible, show info panel
+    d3.select("#info-panel").classed("hidden", false);
     
     d3.select("#reset-button").classed("visible", true);
     
@@ -142,6 +276,12 @@ function zoomToState(stateFeature, stateName, stateData, countyFeatures, colorSc
         return d.id.substring(0, 2) === stateFips;
     });
     
+    // Use current metric for initial coloring with metric-specific color scheme
+    const values = stateData.map(d => +d[currentMetric]).filter(v => !isNaN(v));
+    const countyColorScale = d3.scaleSequential()
+        .domain(d3.extent(values))
+        .interpolator(getMetricColorScheme(currentMetric));
+    
     const countyDataMap = new Map();
     stateData.forEach(d => {
         const normalizedName = (d[COUNTY_COLUMN] || "").toLowerCase().replace(/\s+county\s*$/i, '').trim();
@@ -154,14 +294,26 @@ function zoomToState(stateFeature, stateName, stateData, countyFeatures, colorSc
         .attr("class", "county")
         .attr("d", path)
         .attr("fill", d => {
-            const matchingData = stateData.find(cd => {
-                const dataCountyName = (cd[COUNTY_COLUMN] || "").toLowerCase().replace(/\s+county\s*$/i, '').trim();
-                return countyDataMap.has(dataCountyName);
-            });
+            const countyTopoName = d.properties && d.properties.name ? d.properties.name.toLowerCase() : '';
+            let matchingData = null;
+            
+            for (let [normalizedName, data] of countyDataMap) {
+                if (countyTopoName.includes(normalizedName) || normalizedName.includes(countyTopoName)) {
+                    matchingData = data;
+                    break;
+                }
+            }
+            
+            if (!matchingData) {
+                matchingData = stateData.find(cd => {
+                    const dataCountyName = (cd[COUNTY_COLUMN] || "").toLowerCase().replace(/\s+county\s*$/i, '').trim();
+                    return countyTopoName.includes(dataCountyName) || dataCountyName.includes(countyTopoName);
+                });
+            }
             
             if (matchingData) {
-                const value = +matchingData[VARIABLE_NAME];
-                return isNaN(value) ? "#e0e0e0" : colorScale(value);
+                const value = +matchingData[currentMetric];
+                return isNaN(value) ? "#e0e0e0" : countyColorScale(value);
             }
             return "#e0e0e0";
         })
@@ -172,11 +324,7 @@ function zoomToState(stateFeature, stateName, stateData, countyFeatures, colorSc
             d3.select(this)
                 .attr("stroke", "#667eea")
                 .attr("stroke-width", 2);
-            
-            const countyName = getCountyNameFromFips(d.id, stateData);
-            if (countyName) {
-                d3.select(this).raise();
-            }
+            d3.select(this).raise();
         })
         .on("mouseout", function() {
             d3.select(this)
@@ -184,10 +332,7 @@ function zoomToState(stateFeature, stateName, stateData, countyFeatures, colorSc
                 .attr("stroke-width", 0.5);
         })
         .append("title")
-        .text(d => {
-            const countyName = getCountyNameFromFips(d.id, stateData);
-            return countyName || "County data not available";
-        });
+        .text(d => getCountyTooltipText(d, stateData));
     
     countyGroup.append("path")
         .datum(stateFeature)
@@ -201,6 +346,34 @@ function zoomToState(stateFeature, stateName, stateData, countyFeatures, colorSc
         .on("end", function() {
             countyGroup.selectAll("path").transition().duration(300).style("opacity", 1);
         });
+    
+    // Update legend for current metric
+    updateLegendForMetric(currentMetric, stateData);
+}
+
+function getCountyTooltipText(countyFeature, stateData) {
+    const countyTopoName = countyFeature.properties && countyFeature.properties.name ? 
+        countyFeature.properties.name.toLowerCase() : '';
+    
+    let matchingData = null;
+    
+    // Try to find matching county data
+    for (let cd of stateData) {
+        const dataCountyName = (cd[COUNTY_COLUMN] || "").toLowerCase().replace(/\s+county\s*$/i, '').trim();
+        if (countyTopoName.includes(dataCountyName) || dataCountyName.includes(countyTopoName)) {
+            matchingData = cd;
+            break;
+        }
+    }
+    
+    if (matchingData) {
+        const value = +matchingData[currentMetric];
+        const metricLabel = getMetricLabel(currentMetric);
+        const formatStr = getMetricFormat(currentMetric);
+        return `${matchingData[COUNTY_COLUMN]}\n${metricLabel}: ${formatValue(value, formatStr)}`;
+    }
+    
+    return `County ID: ${countyFeature.id}\nData not available`;
 }
 
 function getCountyNameFromFips(fips, stateData) {
@@ -209,7 +382,10 @@ function getCountyNameFromFips(fips, stateData) {
     });
     
     if (matchingData) {
-        return `${matchingData[COUNTY_COLUMN]}\n${VARIABLE_NAME}: ${formatValue(+matchingData[VARIABLE_NAME], ".2f")}`;
+        const value = +matchingData[currentMetric];
+        const metricLabel = getMetricLabel(currentMetric);
+        const formatStr = getMetricFormat(currentMetric);
+        return `${matchingData[COUNTY_COLUMN]}\n${metricLabel}: ${formatValue(value, formatStr)}`;
     }
     
     return `County ID: ${fips}\nClick state to see all counties`;
@@ -218,9 +394,14 @@ function getCountyNameFromFips(fips, stateData) {
 function resetZoom(stateFeatures, stateAverages, colorScale) {
     isZoomed = false;
     currentState = null;
+    currentStateData = null;
+    currentCountyFeatures = null;
+    currentStateFeature = null;
     
     d3.select("#reset-button").classed("visible", false);
     d3.select("#info-panel").classed("hidden", true);
+    
+    // Regional graph panel stays visible
     
     countyGroup.selectAll("*").transition()
         .duration(300)
@@ -237,6 +418,10 @@ function resetZoom(stateFeatures, stateAverages, colorScale) {
         .transition()
         .duration(750)
         .style("opacity", 1);
+    
+    // Reset legend to food insecurity
+    const values = Array.from(stateAverages.values());
+    createLegend(colorScale, values, "Unadjusted Rate of Food Insecurity (%)");
 }
 
 // ============================================
@@ -257,81 +442,191 @@ function showStateInfo(stateName, stateData, stateAverages) {
     
     const content = panel.append("div").attr("class", "panel-content");
     
-    const primarySection = content.append("div").attr("class", "info-section");
-    primarySection.append("h3").text("Primary Metric");
+    // Add metric selector dropdown
+    const selectorDiv = content.append("div").attr("class", "metric-selector");
+    selectorDiv.append("label")
+        .attr("for", "metric-select")
+        .text("Select Health Metric:");
     
-    const mainValue = stateAverages.get(stateName);
+    const select = selectorDiv.append("select")
+        .attr("id", "metric-select")
+        .on("change", function() {
+            const selectedMetric = this.value;
+            onMetricChange(selectedMetric);
+        });
+    
+    select.selectAll("option")
+        .data(COUNTY_METRICS)
+        .join("option")
+        .attr("value", d => d.value)
+        .property("selected", d => d.value === currentMetric)
+        .text(d => d.label);
+    
+    // Primary section for current metric
+    const primarySection = content.append("div").attr("class", "info-section");
+    primarySection.append("h3").text("Selected Metric Statistics");
+    
+    const values = stateData.map(d => +d[currentMetric]).filter(v => !isNaN(v));
     const primaryGrid = primarySection.append("div").attr("class", "stat-grid");
     
-    const mainCard = primaryGrid.append("div").attr("class", "stat-card");
-    mainCard.append("div").attr("class", "stat-label").text(VARIABLE_NAME + " (Avg)");
-    mainCard.append("div").attr("class", "stat-value").text(formatValue(mainValue, ".2f"));
-    
-    const values = stateData.map(d => +d[VARIABLE_NAME]).filter(v => !isNaN(v));
+    const avgCard = primaryGrid.append("div").attr("class", "stat-card");
+    avgCard.append("div").attr("class", "stat-label").text("Average");
+    avgCard.append("div").attr("class", "stat-value").text(formatValue(d3.mean(values), getMetricFormat(currentMetric)));
     
     const minCard = primaryGrid.append("div").attr("class", "stat-card").style("border-left-color", "#e74c3c");
     minCard.append("div").attr("class", "stat-label").text("Minimum");
-    minCard.append("div").attr("class", "stat-value").text(formatValue(d3.min(values), ".2f"));
+    minCard.append("div").attr("class", "stat-value").text(formatValue(d3.min(values), getMetricFormat(currentMetric)));
     
     const maxCard = primaryGrid.append("div").attr("class", "stat-card").style("border-left-color", "#27ae60");
     maxCard.append("div").attr("class", "stat-label").text("Maximum");
-    maxCard.append("div").attr("class", "stat-value").text(formatValue(d3.max(values), ".2f"));
+    maxCard.append("div").attr("class", "stat-value").text(formatValue(d3.max(values), getMetricFormat(currentMetric)));
     
     const medianCard = primaryGrid.append("div").attr("class", "stat-card").style("border-left-color", "#f39c12");
     medianCard.append("div").attr("class", "stat-label").text("Median");
-    medianCard.append("div").attr("class", "stat-value").text(formatValue(d3.median(values), ".2f"));
+    medianCard.append("div").attr("class", "stat-value").text(formatValue(d3.median(values), getMetricFormat(currentMetric)));
     
-    if (ADDITIONAL_VARIABLES.length > 0) {
-        const statsSection = content.append("div").attr("class", "info-section");
-        statsSection.append("h3").text("Additional Statistics");
-        
-        ADDITIONAL_VARIABLES.forEach(variable => {
-            const value = calculateStatistic(stateData, variable.column, variable.aggregate);
-            const row = statsSection.append("div").attr("class", "stat-row");
-            row.append("div").attr("class", "label").text(variable.label);
-            row.append("div").attr("class", "value").text(formatValue(value, variable.format));
-        });
+    // County distribution chart for current metric
+    const countySection = content.append("div").attr("class", "info-section");
+    countySection.append("h3").text("County Distribution");
+    
+    const chartContainer = countySection.append("div").attr("id", "county-distribution-chart");
+    
+    // Create distribution chart
+    createCountyDistributionChart(chartContainer, stateData, currentMetric);
+}
+
+// Function to create county distribution chart
+function createCountyDistributionChart(container, stateData, metric) {
+    container.html(""); // Clear previous chart
+    
+    const formatStr = getMetricFormat(metric);
+    const metricLabel = getMetricLabel(metric);
+    
+    // Get values for the metric
+    const values = stateData.map(d => +d[metric]).filter(v => !isNaN(v));
+    
+    if (values.length === 0) {
+        container.append("p").text("No data available for this metric.");
+        return;
     }
     
-    const countySection = content.append("div").attr("class", "info-section");
-    countySection.append("h3").text("Counties Ranked");
+    // Create histogram bins
+    const numBins = Math.min(10, Math.ceil(values.length / 3));
+    const histogram = d3.bin()
+        .domain(d3.extent(values))
+        .thresholds(numBins);
     
-    const countyList = countySection.append("div").attr("class", "county-list");
+    const bins = histogram(values);
     
-    const sortedCounties = stateData
-        .map(d => ({...d, numValue: +d[VARIABLE_NAME]}))
-        .filter(d => !isNaN(d.numValue))
-        .sort((a, b) => b.numValue - a.numValue);
+    // Set dimensions
+    const margin = { top: 10, right: 20, bottom: 60, left: 60 };
+    const width = 350 - margin.left - margin.right;
+    const height = 250 - margin.top - margin.bottom;
     
-    sortedCounties.forEach((county, index) => {
-        const countyItem = countyList.append("div").attr("class", "county-item");
-        
-        const nameDiv = countyItem.append("div");
-        nameDiv.append("span")
-            .attr("class", "county-name")
-            .text(county[COUNTY_COLUMN] || "Unknown County");
-        
-        if (index < 3) {
-            nameDiv.append("span")
-                .attr("class", "rank-badge")
-                .text(`#${index + 1}`);
-        }
-        
-        countyItem.append("div")
-            .attr("class", "county-value")
-            .text(formatValue(county.numValue, ".2f"));
-    });
+    // Create SVG
+    const svg = container.append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+    
+    // Create scales
+    const x = d3.scaleLinear()
+        .domain([d3.min(values), d3.max(values)])
+        .range([0, width]);
+    
+    const y = d3.scaleLinear()
+        .domain([0, d3.max(bins, d => d.length)])
+        .range([height, 0]);
+    
+    // Get color scheme for current metric
+    const colorInterpolator = getMetricColorScheme(metric);
+    const colorScale = d3.scaleSequential()
+        .domain(d3.extent(values))
+        .interpolator(colorInterpolator);
+    
+    // Add bars
+    const bars = svg.selectAll(".dist-bar")
+        .data(bins)
+        .join("rect")
+        .attr("class", "dist-bar")
+        .attr("x", d => x(d.x0))
+        .attr("y", d => y(d.length))
+        .attr("width", d => Math.max(0, x(d.x1) - x(d.x0) - 1))
+        .attr("height", d => height - y(d.length))
+        .attr("fill", d => colorScale((d.x0 + d.x1) / 2))
+        .style("cursor", "pointer")
+        .style("transition", "all 0.2s ease");
+    
+    // Add tooltip for bars
+    const tooltip = svg.append("text")
+        .attr("class", "dist-tooltip")
+        .style("font-size", "11px")
+        .style("font-weight", "bold")
+        .style("fill", "#2c3e50")
+        .style("text-anchor", "middle")
+        .style("opacity", 0)
+        .style("pointer-events", "none");
+    
+    bars
+        .on("mouseover", function(event, d) {
+            d3.select(this).attr("opacity", 0.7);
+            tooltip
+                .attr("x", (x(d.x0) + x(d.x1)) / 2)
+                .attr("y", y(d.length) - 5)
+                .text(`${d.length} counties`)
+                .style("opacity", 1)
+                .raise();
+        })
+        .on("mouseout", function() {
+            d3.select(this).attr("opacity", 1);
+            tooltip.style("opacity", 0);
+        });
+    
+    // Add x-axis
+    svg.append("g")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x).ticks(5).tickFormat(d3.format(formatStr)))
+        .selectAll("text")
+        .style("font-size", "10px")
+        .style("fill", "#2c3e50");
+    
+    // Add x-axis label
+    svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", height + 45)
+        .attr("fill", "#2c3e50")
+        .style("text-anchor", "middle")
+        .style("font-size", "11px")
+        .text(metricLabel);
+    
+    // Add y-axis
+    svg.append("g")
+        .call(d3.axisLeft(y).ticks(5))
+        .selectAll("text")
+        .style("font-size", "10px")
+        .style("fill", "#2c3e50");
+    
+    // Add y-axis label
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -45)
+        .attr("x", -height / 2)
+        .attr("fill", "#2c3e50")
+        .style("text-anchor", "middle")
+        .style("font-size", "11px")
+        .text("Number of Counties");
 }
 
 // ============================================
 // LEGEND FUNCTION
 // ============================================
 
-function createLegend(colorScale, values) {
+function createLegend(colorScale, values, title = "Food Insecurity Crude Prevalence") {
     const legendContainer = d3.select("#legend");
     legendContainer.html("");
     
-    legendContainer.append("h4").text("Food Insecurity Crude Prevalence");
+    legendContainer.append("h4").text(title);
     
     const legendSvg = legendContainer.append("svg")
         .attr("width", 300)
@@ -438,10 +733,12 @@ Promise.all([
         .text(d => {
             const stateName = fipsToName.get(d.id);
             const avg = stateAverages.get(stateName);
-            return avg ? `${stateName}\nAverage: ${avg.toFixed(2)}\nClick to zoom in` : stateName || "No data";
+            return stateName && avg 
+                ? `${stateName}\nFood Insecurity: ${avg.toFixed(2)}%\nClick to zoom in` 
+                : stateName || "No data";
         });
     
-    createLegend(colorScale, values);
+    createLegend(colorScale, values, "Food Insecurity Crude Prevalence");
     
     d3.select("#reset-button").on("click", function() {
         resetZoom(stateFeatures, stateAverages, colorScale);
@@ -453,4 +750,3 @@ Promise.all([
         .style("color", "red")
         .text("Error loading data. Check console for details.");
 });
-

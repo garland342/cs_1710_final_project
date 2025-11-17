@@ -33,10 +33,12 @@ body {
     max-width: 1600px;
     margin: 30px auto;
     padding: 0 20px;
+    flex-wrap: wrap;
 }
 
 #map-container {
     flex: 1;
+    min-width: 600px;
     background: white;
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -103,8 +105,27 @@ body {
     display: block;
 }
 
+/* Regional Graph Panel - shown on initial view */
+#regional-graph-panel {
+    width: 400px;
+    min-width: 350px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 0;
+    height: fit-content;
+    position: sticky;
+    top: 30px;
+    overflow: hidden;
+}
+
+#regional-graph-panel.hidden {
+    display: none;
+}
+
 #info-panel {
     width: 400px;
+    min-width: 350px;
     background: white;
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -137,6 +158,41 @@ body {
 
 .panel-content {
     padding: 25px;
+}
+
+/* Metric Selector Dropdown */
+.metric-selector {
+    margin-bottom: 25px;
+}
+
+.metric-selector label {
+    display: block;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.metric-selector select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #2c3e50;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.metric-selector select:hover {
+    border-color: #667eea;
+}
+
+.metric-selector select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 .info-section {

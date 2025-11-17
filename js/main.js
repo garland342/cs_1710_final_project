@@ -61,6 +61,12 @@ document.addEventListener("DOMContentLoaded", () => {
       foodDesertRegionData
     );
 
+    // Create regional chart in the map's regional panel
+    createFoodDesertRegionalChart(
+      "#regional-chart-content",
+      foodDesertRegionData
+    );
+
     // Create depression bar chart (States)
     createDepressionBarChart(
       "#depression-bar-chart-container",
@@ -196,14 +202,16 @@ document.addEventListener("DOMContentLoaded", () => {
     function createFoodDesertRegionalChart(containerSelector, data) {
       const container = d3.select(containerSelector);
       
-      // Add title text above the chart
-      container.append("p")
-        .attr("class", "chart-title")
-        .style("font-size", "1.1rem")
-        .style("font-weight", "bold")
-        .style("margin-bottom", "15px")
-        .style("text-align", "center")
-        .text("Regional Distribution of Food Desert Tracts");
+      // Don't add title for the regional panel (it has a header)
+      if (containerSelector !== "#regional-chart-content") {
+        container.append("p")
+          .attr("class", "chart-title")
+          .style("font-size", "1.1rem")
+          .style("font-weight", "bold")
+          .style("margin-bottom", "15px")
+          .style("text-align", "center")
+          .text("Regional Distribution of Food Desert Tracts");
+      }
       
       // Set dimensions
       const margin = { top: 20, right: 20, bottom: 80, left: 80 };
