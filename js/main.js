@@ -88,7 +88,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function createFoodDesertBarChart(containerSelector, data) {
       const container = d3.select(containerSelector);
       
-      // Add title text above the chart
       container.append("p")
         .attr("class", "chart-title")
         .style("font-size", "1.1rem")
@@ -97,19 +96,16 @@ document.addEventListener("DOMContentLoaded", () => {
         .style("text-align", "center")
         .text("Top 10 States with the Highest Number of Low-Income Low Access Tracts");
       
-      // Set dimensions
       const margin = { top: 20, right: 20, bottom: 80, left: 80 };
       const width = 500 - margin.left - margin.right;
       const height = 400 - margin.top - margin.bottom;
 
-      // Create SVG
       const svg = container.append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-      // Create scales
       const x = d3.scaleBand()
         .domain(data.map(d => d.state))
         .range([0, width])
@@ -119,7 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
         .domain([0, d3.max(data, d => d.tracts) * 1.1])
         .range([height, 0]);
 
-      // Add bars with purple gradient
       const bars = svg.selectAll(".bar")
         .data(data)
         .join("rect")
@@ -132,7 +127,6 @@ document.addEventListener("DOMContentLoaded", () => {
         .style("cursor", "pointer")
         .style("transition", "all 0.2s ease");
       
-      // Create tooltip text element for hover values - append after bars to bring to front
       const tooltip = svg.append("text")
         .attr("class", "bar-tooltip")
         .style("font-size", "12px")
@@ -143,27 +137,21 @@ document.addEventListener("DOMContentLoaded", () => {
         .style("pointer-events", "none")
         .style("z-index", 1000);
       
-      // Add hover handlers to bars for tooltip
       bars
         .on("mouseover", function(event, d) {
-          // Change bar to darker purple
           d3.select(this).attr("fill", "#764ba2");
-          // Show tooltip
           tooltip
             .attr("x", x(d.state) + x.bandwidth() / 2)
             .attr("y", y(d.tracts) - 5)
             .text(`(${d.tracts.toLocaleString()})`)
             .style("opacity", 1)
-            .raise(); // Bring to front
+            .raise();
         })
         .on("mouseout", function() {
-          // Change bar back to original purple
           d3.select(this).attr("fill", "#667eea");
-          // Hide tooltip
           tooltip.style("opacity", 0);
         });
 
-      // Add x-axis
       svg.append("g")
         .attr("transform", `translate(0,${height})`)
         .call(d3.axisBottom(x))
@@ -173,7 +161,6 @@ document.addEventListener("DOMContentLoaded", () => {
         .style("font-size", "10px")
         .style("fill", "#2c3e50");
 
-      // Add x-axis label
       svg.append("text")
         .attr("x", width / 2)
         .attr("y", height + 70)
@@ -182,13 +169,11 @@ document.addEventListener("DOMContentLoaded", () => {
         .style("font-size", "12px")
         .text("State");
 
-      // Add y-axis
       svg.append("g")
         .call(d3.axisLeft(y))
         .selectAll("text")
         .style("fill", "#2c3e50");
 
-      // Add y-axis label
       svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", -65)
@@ -213,19 +198,16 @@ document.addEventListener("DOMContentLoaded", () => {
           .text("Regional Distribution of Food Desert Tracts");
       }
       
-      // Set dimensions
       const margin = { top: 20, right: 20, bottom: 80, left: 80 };
       const width = 500 - margin.left - margin.right;
       const height = 400 - margin.top - margin.bottom;
 
-      // Create SVG
       const svg = container.append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-      // Create scales
       const x = d3.scaleBand()
         .domain(data.map(d => d.region))
         .range([0, width])
@@ -235,7 +217,6 @@ document.addEventListener("DOMContentLoaded", () => {
         .domain([0, d3.max(data, d => d.tracts) * 1.1])
         .range([height, 0]);
 
-      // Add bars with purple gradient
       const bars = svg.selectAll(".bar")
         .data(data)
         .join("rect")
@@ -248,7 +229,6 @@ document.addEventListener("DOMContentLoaded", () => {
         .style("cursor", "pointer")
         .style("transition", "all 0.2s ease");
       
-      // Create tooltip text element for hover values - append after bars to bring to front
       const tooltip = svg.append("text")
         .attr("class", "bar-tooltip")
         .style("font-size", "12px")
@@ -259,27 +239,21 @@ document.addEventListener("DOMContentLoaded", () => {
         .style("pointer-events", "none")
         .style("z-index", 1000);
       
-      // Add hover handlers to bars
       bars
         .on("mouseover", function(event, d) {
-          // Change bar to darker purple
           d3.select(this).attr("fill", "#764ba2");
-          // Show tooltip
           tooltip
             .attr("x", x(d.region) + x.bandwidth() / 2)
             .attr("y", y(d.tracts) - 5)
             .text(`(${d.tracts.toLocaleString()})`)
             .style("opacity", 1)
-            .raise(); // Bring to front
+            .raise();
         })
         .on("mouseout", function() {
-          // Change bar back to original purple
           d3.select(this).attr("fill", "#667eea");
-          // Hide tooltip
           tooltip.style("opacity", 0);
         });
 
-      // Add x-axis
       svg.append("g")
         .attr("transform", `translate(0,${height})`)
         .call(d3.axisBottom(x))
@@ -288,7 +262,6 @@ document.addEventListener("DOMContentLoaded", () => {
         .style("font-size", "11px")
         .style("fill", "#2c3e50");
 
-      // Add x-axis label
       svg.append("text")
         .attr("x", width / 2)
         .attr("y", height + 60)
@@ -297,13 +270,11 @@ document.addEventListener("DOMContentLoaded", () => {
         .style("font-size", "12px")
         .text("Region");
 
-      // Add y-axis
       svg.append("g")
         .call(d3.axisLeft(y))
         .selectAll("text")
         .style("fill", "#2c3e50");
 
-      // Add y-axis label
       svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", -65)
@@ -317,7 +288,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function createDepressionBarChart(containerSelector, data, xKey, yKey, yLabel) {
       const container = d3.select(containerSelector);
       
-      // Only add title for the states chart (left side)
       if (containerSelector === "#depression-bar-chart-container") {
         container.append("p")
           .attr("class", "chart-title")
@@ -328,9 +298,7 @@ document.addEventListener("DOMContentLoaded", () => {
           .text("Top 10 States with Highest Proportion of Depressed Individuals");
       }
       
-      // Add title for the regional chart (right side) to match format
       if (containerSelector === "#depression-map-container") {
-        // Remove the existing chart-subtitle from HTML and add it here with same styling
         container.select(".chart-subtitle").remove();
         container.append("p")
           .attr("class", "chart-title")
@@ -341,33 +309,26 @@ document.addEventListener("DOMContentLoaded", () => {
           .text("Regional Distribution of Depression Prevalence");
       }
       
-      // Set dimensions with extra right margin for the label
       const margin = { top: 20, right: 120, bottom: 80, left: 80 };
       const width = 500 - margin.left - margin.right;
       const height = 350 - margin.top - margin.bottom;
 
-      // Create SVG
       const svg = container.append("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
-      // Create scales
       const x = d3.scaleBand()
         .domain(data.map(d => d[xKey]))
         .range([0, width])
         .padding(0.2);
 
-      // Adjust y-axis: start at 0 but use a tighter max to emphasize differences
-      // For regional chart, use 25 as max to make South and Midwest appear worse
-      // For states chart, keep 35 to accommodate higher state values
       const maxValue = containerSelector === "#depression-map-container" ? 25 : 35;
       const y = d3.scaleLinear()
         .domain([0, maxValue])
         .range([height, 0]);
 
-      // Add bars with purple gradient
       const bars = svg.selectAll(".bar")
         .data(data)
         .join("rect")
@@ -380,7 +341,6 @@ document.addEventListener("DOMContentLoaded", () => {
         .style("cursor", "pointer")
         .style("transition", "all 0.2s ease");
       
-      // Create tooltip text element for hover values - append after bars to bring to front
       const tooltip = svg.append("text")
         .attr("class", "bar-tooltip")
         .style("font-size", "12px")
@@ -391,32 +351,25 @@ document.addEventListener("DOMContentLoaded", () => {
         .style("pointer-events", "none")
         .style("z-index", 1000);
       
-      // Add hover handlers to bars
       bars
         .on("mouseover", function(event, d) {
-          // Change bar to darker purple
           d3.select(this).attr("fill", "#764ba2");
-          // Show tooltip
           const value = d[yKey];
           tooltip
             .attr("x", x(d[xKey]) + x.bandwidth() / 2)
             .attr("y", y(d[yKey]) - 5)
             .text(`(${value.toFixed(2)}%)`)
             .style("opacity", 1)
-            .raise(); // Bring to front
+            .raise();
         })
         .on("mouseout", function() {
-          // Change bar back to original purple
           d3.select(this).attr("fill", "#667eea");
-          // Hide tooltip
           tooltip.style("opacity", 0);
         });
 
-      // Add nationwide average line (only for states chart)
       if (containerSelector === "#depression-bar-chart-container") {
         const nationalAvg = 22.5;
         
-        // Draw line with black accent
         svg.append("line")
           .attr("x1", 0)
           .attr("x2", width)
@@ -426,7 +379,6 @@ document.addEventListener("DOMContentLoaded", () => {
           .attr("stroke-width", 2)
           .attr("stroke-dasharray", "5,5");
         
-        // Add label outside the graph
         svg.append("text")
           .attr("x", width + 5)
           .attr("y", y(nationalAvg) + 5)
@@ -435,7 +387,6 @@ document.addEventListener("DOMContentLoaded", () => {
           .style("font-weight", "bold")
           .text("Nationwide Average");
         
-        // Add percentage below Nationwide Average in black
         svg.append("text")
           .attr("x", width + 5)
           .attr("y", y(nationalAvg) + 20)
@@ -445,7 +396,6 @@ document.addEventListener("DOMContentLoaded", () => {
           .text("22.5%");
       }
 
-      // Add x-axis
       svg.append("g")
         .attr("transform", `translate(0,${height})`)
         .call(d3.axisBottom(x))
@@ -455,7 +405,6 @@ document.addEventListener("DOMContentLoaded", () => {
         .style("font-size", "10px")
         .style("fill", "#2c3e50");
 
-      // Add x-axis label
       svg.append("text")
         .attr("x", width / 2)
         .attr("y", height + 70)
@@ -464,13 +413,11 @@ document.addEventListener("DOMContentLoaded", () => {
         .style("font-size", "12px")
         .text(containerSelector === "#depression-bar-chart-container" ? "States" : "Region");
 
-      // Add y-axis
       svg.append("g")
         .call(d3.axisLeft(y))
         .selectAll("text")
         .style("fill", "#2c3e50");
 
-      // Add y-axis label - push down more to prevent "Years" from cutting off
       svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", -60)
@@ -506,7 +453,6 @@ document.addEventListener("DOMContentLoaded", () => {
       .attr("width", width)
       .attr("height", height);
 
-    // Create semi-random grid positions with some variation
     const cols = 3;
     const rows = 3;
     const cellWidth = width / cols;
@@ -518,20 +464,16 @@ document.addEventListener("DOMContentLoaded", () => {
       y: Math.floor(i / cols) * cellHeight + cellHeight / 2 + (Math.random() - 0.5) * cellHeight * 0.3
     }));
 
-    // Extract coordinates for d3.Delaunay
     const coordinates = points.map(d => [d.x, d.y]);
 
     const delaunay = d3.Delaunay.from(coordinates);
     const voronoi = delaunay.voronoi([0, 0, width, height]);
 
-    // Map sites to their polygons and include the original data
     const polygons = Array.from({ length: points.length }, (_, i) => ({
       data: points[i],
       polygon: voronoi.cellPolygon(i)
     })).filter(d => d.polygon !== null);
 
-
-    // Create a group for each cell
     const cellGroups = svg.selectAll(".voronoi-cell")
       .data(polygons)
       .join("g")
@@ -543,7 +485,6 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         });
 
-    // Append the Voronoi cell paths
     cellGroups.append("path")
       .attr("d", d => "M" + d.polygon.join("L") + "Z")
       .attr("fill", (d, i) => d3.schemeCategory10[i % 10]) 
@@ -552,7 +493,6 @@ document.addEventListener("DOMContentLoaded", () => {
       .attr("opacity", 0.7)
       .attr("class", "voronoi-path")
       .each(function(d, i) {
-        // Store original color
         const color = d3.schemeCategory10[i % 10];
         d3.select(this).attr("data-original-color", color);
       })
@@ -573,7 +513,6 @@ document.addEventListener("DOMContentLoaded", () => {
           .attr("fill", originalColor);
       });
 
-    // Append text labels to the center of each cell
     const textElements = cellGroups.append("text")
       .attr("x", d => d3.polygonCentroid(d.polygon)[0]) 
       .attr("y", d => d3.polygonCentroid(d.polygon)[1])
@@ -584,10 +523,8 @@ document.addEventListener("DOMContentLoaded", () => {
       .attr("fill", "white")
       .style("pointer-events", "none"); 
       
-    // Apply the custom wrapText function
     textElements.call(wrapText, 120);
 
-    // Function to wrap text inside SVG
     function wrapText(text, width) {
       text.each(function(d) { 
         const textElement = d3.select(this);
@@ -598,7 +535,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let word;
         let line = [];
         let lineNumber = 0;
-        const lineHeight = 1.1; // ems
+        const lineHeight = 1.1;
         const y = textElement.attr("y");
         const x = textElement.attr("x");
         let tspan = textElement.text(null)
@@ -620,7 +557,6 @@ document.addEventListener("DOMContentLoaded", () => {
               .text(word);
           }
         }
-        // Adjust vertical position for multi-line text to truly center
         const totalLines = textElement.selectAll("tspan").size();
         if (totalLines > 1) {
           textElement.selectAll("tspan")
@@ -628,6 +564,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
     }
+    
     const spiralContainer = document.getElementById('spiral-container');
     if (spiralContainer) {
       createSpiralVisualization('#spiral-container', 'data/food_access_data.csv');
@@ -644,12 +581,13 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function createSpiralVisualization(containerId, dataPath) {
-  // Private namespace to avoid conflicts
   const module = {
-    distances: [0.5, 1, 10, 20],
+    urbanDistances: [0.1, 0.3, 0.5, 1],
+    ruralDistances: [2, 5, 10, 20],
+    currentDistances: [0.1, 0.3, 0.5, 1],
+    currentMode: 'urban',
     a: 8,
     b: 6,
-    maxMiles: 20,
     center: { x: 0, y: 0 },
     viewW: 600,
     viewH: 520,
@@ -663,43 +601,167 @@ function createSpiralVisualization(containerId, dataPath) {
     return null;
   }
 
-  const tooltip = d3.select('body')
-    .append('div')
-    .attr('class', 'spiral-tooltip spiral-hidden')
-    .style('opacity', 0);
+  const instructText = container.insert('p', ':first-child')
+    .attr('class', 'spiral-instruction-text')
+    .style('text-align', 'center')
+    .style('color', '#666')
+    .style('font-size', '0.95rem')
+    .style('margin-top', '3rem')
+    .style('margin-bottom', '2rem')
+    .style('font-style', 'italic')
+    .text('Hover over each distance to uncover food quality in rural and urban food deserts');
 
-  const vizWrap = container.append('div').attr('class', 'spiral-viz-wrap');
-  const viz = vizWrap.append('div').attr('class', 'spiral-viz');
-  const meta = vizWrap.append('aside').attr('class', 'spiral-meta');
+  const vizWrap = container.append('div')
+    .attr('class', 'spiral-viz-wrap')
+    .style('display', 'flex')
+    .style('gap', '2rem')
+    .style('align-items', 'flex-start');
   
-  const dataStatus = meta.append('div').attr('class', 'spiral-data-status').text('Loading data...');
-  const legend = meta.append('div').attr('class', 'spiral-legend');
-  const metaPanel = meta.append('div').attr('class', 'spiral-meta-panel').style('display', 'none');
+  const viz = vizWrap.append('div')
+    .attr('class', 'spiral-viz')
+    .style('flex', '1');
+  
+  const toggleContainer = vizWrap.append('div')
+    .attr('class', 'spiral-toggle-container')
+    .style('display', 'flex')
+    .style('flex-direction', 'column')
+    .style('gap', '1rem')
+    .style('padding', '1rem');
+
+  const urbanBtn = toggleContainer.append('button')
+    .attr('class', 'spiral-toggle-btn active')
+    .style('padding', '0.75rem 1.5rem')
+    .style('border', '2px solid #667eea')
+    .style('background', '#667eea')
+    .style('color', 'white')
+    .style('border-radius', '8px')
+    .style('cursor', 'pointer')
+    .style('font-weight', 'bold')
+    .style('font-size', '1rem')
+    .style('transition', 'all 0.3s')
+    .text('Urban');
+
+  const ruralBtn = toggleContainer.append('button')
+    .attr('class', 'spiral-toggle-btn')
+    .style('padding', '0.75rem 1.5rem')
+    .style('border', '2px solid #667eea')
+    .style('background', 'white')
+    .style('color', '#667eea')
+    .style('border-radius', '8px')
+    .style('cursor', 'pointer')
+    .style('font-weight', 'bold')
+    .style('font-size', '1rem')
+    .style('transition', 'all 0.3s')
+    .text('Rural');
 
   const svg = viz.append('svg')
     .attr('preserveAspectRatio', 'xMidYMid meet')
     .classed('spiral-svg', true);
 
-  svg.append('path').attr('class', 'spiral-path');
+  svg.append('path').attr('class', 'spiral-path')
+    .style('fill', 'none')
+    .style('stroke', '#ccc')
+    .style('stroke-width', '2px');
+  
   const markerGroup = svg.append('g').attr('class', 'spiral-markers');
 
-  const color = d3.scaleLinear().domain([0, module.maxMiles]).range(['#2ca25f', '#de2d26']);
+  const foodImages = {
+    urban: {
+      0.1: [
+        'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400',
+        'https://images.unsplash.com/photo-1610348725531-843dff563e2c?w=400',
+        'https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?w=400',
+        'https://images.unsplash.com/photo-1550989460-0adf9ea622e2?w=400'
+      ],
+      0.3: [
+        'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400',
+        'https://images.unsplash.com/photo-1610348725531-843dff563e2c?w=400',
+        'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400',
+        'https://images.unsplash.com/photo-1529042410759-befb1204b468?w=400'
+      ],
+      0.5: [
+        'https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?w=400',
+        'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400',
+        'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400',
+        'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=400'
+      ],
+      1: [
+        'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400',
+        'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400',
+        'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400',
+        'https://images.unsplash.com/photo-1481070555726-e2fe8357725c?w=400'
+      ]
+    },
+    rural: {
+      2: [
+        'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400',
+        'https://images.unsplash.com/photo-1610348725531-843dff563e2c?w=400',
+        'https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?w=400',
+        'https://images.unsplash.com/photo-1550989460-0adf9ea622e2?w=400'
+      ],
+      5: [
+        'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400',
+        'https://images.unsplash.com/photo-1610348725531-843dff563e2c?w=400',
+        'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400',
+        'https://images.unsplash.com/photo-1529042410759-befb1204b468?w=400'
+      ],
+      10: [
+        'https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?w=400',
+        'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400',
+        'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400',
+        'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=400'
+      ],
+      20: [
+        'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400',
+        'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400',
+        'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400',
+        'https://images.unsplash.com/photo-1481070555726-e2fe8357725c?w=400'
+      ]
+    }
+  };
+
+  function getColorForDistance(distance, mode) {
+    if (mode === 'urban') {
+      if (distance === 0.1) return '#2d5016';
+      if (distance === 0.3) return '#5a9216';
+      if (distance === 0.5) return '#ff8c00';
+      if (distance === 1) return '#dc2626';
+    } else {
+      if (distance === 2) return '#2d5016';
+      if (distance === 5) return '#5a9216';
+      if (distance === 10) return '#ff8c00';
+      if (distance === 20) return '#dc2626';
+    }
+    return '#666';
+  }
+
+  function getFoodsByDistance(distance, mode) {
+    if (mode === 'urban') {
+      return foodImages.urban[distance] || [];
+    } else {
+      return foodImages.rural[distance] || [];
+    }
+  }
 
   function radiusToTheta(r) {
     return (r - module.a) / module.b;
   }
 
   function milesToRadius(d) {
-    const minMile = 0.5;
-    const logMin = Math.log10(minMile);
-    const logMax = Math.log10(module.maxMiles);
+    const maxDist = module.currentMode === 'urban' ? 1 : 20;
+    const minDist = module.currentMode === 'urban' ? 0.1 : 2;
+    
+    const logMin = Math.log10(minDist);
+    const logMax = Math.log10(maxDist);
     const logD = Math.log10(d);
     const t = (logD - logMin) / (logMax - logMin);
     return module.a + t * (module.maxVisualRadius - module.a);
   }
 
   function buildSpiralPoints() {
-    const tMax = radiusToTheta(module.maxVisualRadius);
+    const maxDist = module.currentMode === 'urban' ? 1 : 20;
+    const maxR = milesToRadius(maxDist);
+    const tMax = radiusToTheta(maxR);
     const points = [];
     const steps = Math.max(60, Math.ceil(tMax * 12));
     for (let i = 0; i <= steps; i++) {
@@ -712,105 +774,160 @@ function createSpiralVisualization(containerId, dataPath) {
     return points;
   }
 
-  function sampleFoodsByDistance(miles) {
-    if (miles <= 2) return ['Fresh fruits', 'Fresh vegetables', 'Whole grains', 'Low-fat dairy'];
-    if (miles <= 10) return ['Fruits', 'Vegetables', 'Canned vegetables', 'Bread', 'Milk'];
-    if (miles <= 20) return ['Processed snacks', 'Soda', 'Canned soups', 'Fast food options'];
-    return ['Mostly convenience store items', 'Packaged snacks', 'Sugary drinks', 'Limited fresh produce'];
+  function showFoodOverlay(event, distance, mode) {
+    d3.select('.food-overlay').remove();
+    
+    const foods = getFoodsByDistance(distance, mode);
+    const overlay = d3.select('body')
+      .append('div')
+      .attr('class', 'food-overlay')
+      .style('position', 'fixed')
+      .style('top', '0')
+      .style('left', '0')
+      .style('width', '100%')
+      .style('height', '100%')
+      .style('pointer-events', 'none')
+      .style('z-index', '9999')
+      .style('display', 'flex')
+      .style('flex-direction', 'column')
+      .style('justify-content', 'center')
+      .style('align-items', 'center')
+      .style('gap', '1rem')
+      .style('padding', '2rem')
+      .style('background', 'rgba(255, 255, 255, 0.97)')
+      .style('opacity', '0');
+
+    overlay.append('div')
+      .style('font-size', '2.5rem')
+      .style('font-weight', 'bold')
+      .style('color', getColorForDistance(distance, mode))
+      .style('margin-bottom', '1rem')
+      .text(`Food options ${distance} mile${distance !== 1 ? 's' : ''} away`);
+
+    const imageGrid = overlay.append('div')
+      .style('display', 'grid')
+      .style('grid-template-columns', 'repeat(auto-fit, minmax(200px, 1fr))')
+      .style('gap', '1.5rem')
+      .style('max-width', '1200px')
+      .style('width', '100%');
+
+    foods.forEach((imageUrl, i) => {
+      const imgContainer = imageGrid.append('div')
+        .style('animation', `fadeInScale 0.6s ease-out ${i * 0.1}s both`)
+        .style('border-radius', '12px')
+        .style('overflow', 'hidden')
+        .style('box-shadow', '0 4px 12px rgba(0,0,0,0.15)');
+
+      imgContainer.append('img')
+        .attr('src', imageUrl)
+        .style('width', '100%')
+        .style('height', '200px')
+        .style('object-fit', 'cover')
+        .style('display', 'block');
+    });
+
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes fadeInScale {
+        from {
+          opacity: 0;
+          transform: scale(0.8) translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    overlay.transition().duration(400).style('opacity', '1');
   }
 
-  function chooseLatColumn(miles) {
-    if (miles <= 0.75) return 'LATracts_half';
-    if (miles <= 5) return 'LATracts1';
-    if (miles <= 15) return 'LATracts10';
-    return 'LATracts20';
+  function hideFoodOverlay() {
+    d3.select('.food-overlay')
+      .transition()
+      .duration(200)
+      .style('opacity', '0')
+      .remove();
   }
 
-  function placeMarkers(rows) {
-    const markers = markerGroup.selectAll('.spiral-marker-g').data(module.distances, d => d);
-    const enter = markers.enter().append('g').attr('class', 'spiral-marker-g');
-    enter.append('circle').attr('class', 'spiral-marker');
-    enter.append('text').attr('class', 'spiral-marker-label').attr('text-anchor', 'middle').attr('dy', -12);
-    enter.append('text').attr('class', 'spiral-marker-badge').attr('text-anchor', 'middle').attr('dy', 12);
+  function placeMarkers() {
+    const markers = markerGroup.selectAll('.spiral-marker-g')
+      .data(module.currentDistances, d => d);
+    
+    markers.exit()
+      .transition()
+      .duration(300)
+      .style('opacity', 0)
+      .remove();
+
+    const enter = markers.enter()
+      .append('g')
+      .attr('class', 'spiral-marker-g')
+      .style('opacity', 0);
+    
+    enter.append('circle')
+      .attr('class', 'spiral-marker')
+      .style('cursor', 'pointer')
+      .style('transition', 'all 0.3s');
+    
+    enter.append('text')
+      .attr('class', 'spiral-marker-label')
+      .attr('text-anchor', 'middle')
+      .attr('dy', -15)
+      .style('font-size', '12px')
+      .style('font-weight', 'bold')
+      .style('fill', '#2c3e50')
+      .style('pointer-events', 'none');
 
     const all = enter.merge(markers);
-    all.each(function (d) {
-      const r = milesToRadius(d);
-      const t = radiusToTheta(r);
-      const x = module.center.x + r * Math.cos(t);
-      const y = module.center.y + r * Math.sin(t);
-      
-      let candidates = [];
-      let col = chooseLatColumn(d);
-      if (rows && rows.length) {
-        candidates = rows.filter(r => {
-          const v = r[col];
-          return v !== undefined && v !== null && v !== '' && +v > 0;
-        });
-      }
-      
-      d3.select(this).attr('transform', `translate(${x},${y})`);
-      d3.select(this).select('circle')
-        .attr('r', Math.max(7, Math.round(module.viewW / 100)))
-        .attr('fill', color(d))
-        .on('mouseenter', (event, dist) => {
-          showTooltip(event, dist, candidates.length ? candidates : rows, candidates.length === 0);
-        })
-        .on('mousemove', (event) => moveTooltip(event))
-        .on('mouseleave', hideTooltip)
-        .on('click', (event) => {
-          showMetaPanel(d, candidates, col);
-        });
-      d3.select(this).select('.spiral-marker-label').text(d + ' mi');
-      d3.select(this).select('.spiral-marker-badge')
-        .text(candidates.length > 0 ? candidates.length : '0')
-        .attr('x', 0)
-        .attr('dy', 12);
-    });
-    markers.exit().remove();
+    
+    all.transition()
+      .duration(500)
+      .style('opacity', 1)
+      .attr('transform', d => {
+        const r = milesToRadius(d);
+        const t = radiusToTheta(r);
+        const x = module.center.x + r * Math.cos(t);
+        const y = module.center.y + r * Math.sin(t);
+        return `translate(${x},${y})`;
+      });
+
+    all.select('circle')
+      .transition()
+      .duration(500)
+      .attr('r', 10)
+      .attr('fill', d => getColorForDistance(d, module.currentMode))
+      .attr('stroke', '#fff')
+      .attr('stroke-width', 2);
+
+    all.select('.spiral-marker-label')
+      .transition()
+      .duration(500)
+      .attr('fill', d => getColorForDistance(d, module.currentMode))
+      .text(d => `${d} mi`);
+
+    all.select('circle')
+      .on('mouseenter', function(event, d) {
+        d3.select(this)
+          .transition()
+          .duration(200)
+          .attr('r', 14)
+          .attr('stroke-width', 3);
+        showFoodOverlay(event, d, module.currentMode);
+      })
+      .on('mouseleave', function() {
+        d3.select(this)
+          .transition()
+          .duration(200)
+          .attr('r', 10)
+          .attr('stroke-width', 2);
+        hideFoodOverlay();
+      });
   }
 
-  function showTooltip(event, miles, rows, isRandom) {
-  let tractInfo = '';
-  if (rows && rows.length && !isRandom) {
-    tractInfo = `<div class="spiral-tooltip-sample"><strong>Matching tracts: ${rows.length}</strong></div>`;
-  }
-
-    const foods = sampleFoodsByDistance(miles).map(f => `<li>${f}</li>`).join('');
-    const html = `<strong>${miles} mile${miles>1?'s':''}</strong>
-      <div class="spiral-small">Typical available food types:</div>
-      <ul class="spiral-tooltip-list">${foods}</ul>
-      ${tractInfo}`;
-  tooltip.html(html).classed('spiral-hidden', false).transition().duration(120).style('opacity', 1);
-  moveTooltip(event);
-}
-
-  function showMetaPanel(distance, candidates, col) {
-    if (candidates.length > 0) {
-      const list = candidates.map(r => `<li>${r.CensusTract || 'n/a'} — ${r.County || ''}, ${r.State || ''}</li>`).join('');
-      metaPanel.html(`<h2>Tracts with limited access (${distance} mi)</h2>
-        <div>Column: <code>${col}</code></div>
-        <div>Matches: <strong>${candidates.length}</strong></div>
-        <ul>${list}</ul>`);
-    } else {
-      metaPanel.html(`<h2>No matching tracts for ${distance} mi</h2>
-        <div>Column: <code>${col}</code></div>
-        <div style="color:#d9534f">No tracts flagged for this distance. Try another marker.</div>`);
-    }
-    metaPanel.style('display', 'block');
-  }
-
-  function moveTooltip(event) {
-    const left = event.pageX + 12;
-    const top = event.pageY + 12;
-    tooltip.style('left', left + 'px').style('top', top + 'px');
-  }
-
-  function hideTooltip() {
-    tooltip.transition().duration(120).style('opacity', 0).on('end', () => tooltip.classed('spiral-hidden', true));
-  }
-
-  function render(rows = module.lastRows) {
+  function render() {
     module.viewW = Math.max(320, viz.node().clientWidth || 600);
     module.viewH = Math.max(360, viz.node().clientHeight || 520);
     svg.attr('viewBox', `0 0 ${module.viewW} ${module.viewH}`);
@@ -818,21 +935,46 @@ function createSpiralVisualization(containerId, dataPath) {
     module.maxVisualRadius = Math.min(module.viewW, module.viewH) * 0.45;
 
     const line = d3.line();
-    svg.select('.spiral-path').attr('d', line(buildSpiralPoints()));
+    svg.select('.spiral-path')
+      .transition()
+      .duration(500)
+      .attr('d', line(buildSpiralPoints()));
 
-    placeMarkers(rows);
+    placeMarkers();
   }
+
+  function switchMode(mode) {
+    module.currentMode = mode;
+    module.currentDistances = mode === 'urban' ? module.urbanDistances : module.ruralDistances;
+    
+    if (mode === 'urban') {
+      urbanBtn
+        .style('background', '#667eea')
+        .style('color', 'white');
+      ruralBtn
+        .style('background', 'white')
+        .style('color', '#667eea');
+    } else {
+      ruralBtn
+        .style('background', '#667eea')
+        .style('color', 'white');
+      urbanBtn
+        .style('background', 'white')
+        .style('color', '#667eea');
+    }
+    
+    render();
+  }
+
+  urbanBtn.on('click', () => switchMode('urban'));
+  ruralBtn.on('click', () => switchMode('rural'));
 
   d3.csv(dataPath).then(rows => {
     module.lastRows = rows;
-    dataStatus.text(`Loaded ${rows.length} rows from ${dataPath.split('/').pop()}`);
-    legend.html(`<strong>Dataset</strong><div>Tracts loaded: ${rows.length}</div>
-      <div style="margin-top:6px;color:#555;font-size:13px">Markers show tracts flagged by distance:<ul class="spiral-tooltip-list" style="margin-top:6px"><li>½ mile → <code>LATracts_half</code></li><li>1 mile → <code>LATracts1</code></li><li>10 miles → <code>LATracts10</code></li><li>20 miles → <code>LATracts20</code></li></ul></div>`);
-    render(rows);
+    render();
   }).catch(err => {
     console.warn('CSV load error', err);
-    dataStatus.text('Could not load data — showing concept-only spiral.');
-    render([]);
+    render();
   });
 
   const resizeHandler = () => render();
@@ -844,7 +986,6 @@ function createSpiralVisualization(containerId, dataPath) {
     render: () => render(),
     destroy: () => {
       window.removeEventListener('resize', resizeHandler);
-      tooltip.remove();
       container.selectAll('*').remove();
     }
   };
@@ -860,7 +1001,7 @@ function createDistanceSlider(containerId, dataPath) {
   };
 
   let currentDistance = 0.5;
-  let currentFilter = 'both'; // 'urban', 'rural', or 'both'
+  let currentFilter = 'both';
   let allData = [];
 
   const container = d3.select(containerId);
@@ -869,10 +1010,8 @@ function createDistanceSlider(containerId, dataPath) {
     return null;
   }
 
-  // Create main wrapper
   const wrapper = container.append('div').attr('class', 'slider-wrapper');
 
-  // Create toggle buttons
   const toggleContainer = wrapper.append('div').attr('class', 'slider-toggle-container');
   
   const urbanBtn = toggleContainer.append('button')
@@ -890,13 +1029,11 @@ function createDistanceSlider(containerId, dataPath) {
     .attr('data-filter', 'rural')
     .text('Rural');
 
-  // Create info display
   const infoDisplay = wrapper.append('div').attr('class', 'slider-info-display');
   const tractCount = infoDisplay.append('div').attr('class', 'slider-tract-count').text('0');
   const tractLabel = infoDisplay.append('div').attr('class', 'slider-tract-label').text('tracts');
   const distanceLabel = infoDisplay.append('div').attr('class', 'slider-distance-label').text('at 0.5 miles');
 
-  // Create SVG for slider
   const width = 600;
   const height = 120;
   const margin = { top: 20, right: 40, left: 40, bottom: 40 };
@@ -911,13 +1048,11 @@ function createDistanceSlider(containerId, dataPath) {
 
   const sliderWidth = width - margin.left - margin.right;
   
-  // Create scale for positioning (logarithmic for better spacing)
   const xScale = d3.scalePoint()
     .domain(distances)
     .range([0, sliderWidth])
     .padding(0);
 
-  // Draw track line
   g.append('line')
     .attr('class', 'slider-track')
     .attr('x1', 0)
@@ -925,7 +1060,6 @@ function createDistanceSlider(containerId, dataPath) {
     .attr('y1', 40)
     .attr('y2', 40);
 
-  // Draw distance markers
   const markers = g.selectAll('.slider-marker')
     .data(distances)
     .join('g')
@@ -942,7 +1076,6 @@ function createDistanceSlider(containerId, dataPath) {
     .attr('text-anchor', 'middle')
     .text(d => d === 0.5 ? '½ mi' : `${d} mi`);
 
-  // Create draggable handle
   const handle = g.append('g')
     .attr('class', 'slider-handle')
     .attr('transform', `translate(${xScale(0.5)}, 40)`)
@@ -958,13 +1091,11 @@ function createDistanceSlider(containerId, dataPath) {
     .attr('dy', 5)
     .text('½');
 
-  // Drag behavior
   const drag = d3.drag()
     .on('start', function() {
       d3.select(this).style('cursor', 'grabbing');
     })
     .on('drag', function(event) {
-      // Find closest distance
       const mouseX = event.x;
       let closestDistance = distances[0];
       let minDiff = Math.abs(xScale(distances[0]) - mouseX);
@@ -988,7 +1119,6 @@ function createDistanceSlider(containerId, dataPath) {
 
   handle.call(drag);
 
-  // Toggle button click handlers
   toggleContainer.selectAll('.slider-toggle-btn')
     .on('click', function() {
       toggleContainer.selectAll('.slider-toggle-btn').classed('active', false);
@@ -997,42 +1127,35 @@ function createDistanceSlider(containerId, dataPath) {
       updateVisualization();
     });
 
-  // Filter data based on current settings
   function getFilteredData() {
-  const column = distanceColumns[currentDistance];
-  
-  return allData.filter(row => {
-    // Check if tract has limited access at this distance
-    const hasLimitedAccess = row[column] && +row[column] > 0;
-    if (!hasLimitedAccess) return false;
+    const column = distanceColumns[currentDistance];
+    
+    return allData.filter(row => {
+      const hasLimitedAccess = row[column] == 1;
+      if (!hasLimitedAccess) return false;
 
-    // Apply urban/rural filter
-    if (currentFilter === 'both') return true;
-    
-    const urbanValue = row.Urban !== undefined && row.Urban !== null && row.Urban !== '' ? +row.Urban : null;
-    
-    if (currentFilter === 'urban') return urbanValue === 1;
-    if (currentFilter === 'rural') return urbanValue === 0;
-    
-    return false;
-  });
-}
+      if (currentFilter === 'both') return true;
+      
+      const urbanValue = row.Urban !== undefined && row.Urban !== null && row.Urban !== '' ? +row.Urban : null;
+      
+      if (currentFilter === 'urban') return urbanValue === 1;
+      if (currentFilter === 'rural') return urbanValue === 0;
+      
+      return false;
+    });
+  }
 
-  // Update visualization based on current state
   function updateVisualization() {
     const filteredData = getFilteredData();
     const count = filteredData.length;
 
-    // Update handle position
     handle.transition()
       .duration(300)
       .attr('transform', `translate(${xScale(currentDistance)}, 40)`);
 
-    // Update handle text
     handle.select('.slider-handle-text')
       .text(currentDistance === 0.5 ? '½' : currentDistance === 1 ? '1' : currentDistance);
 
-    // Update info display
     tractCount.text(count.toLocaleString());
     
     const filterText = currentFilter === 'both' ? '' : 
@@ -1040,14 +1163,12 @@ function createDistanceSlider(containerId, dataPath) {
     
     distanceLabel.text(`${filterText} tracts at ${currentDistance === 0.5 ? '½' : currentDistance} mile${currentDistance > 1 ? 's' : ''} from food access`);
 
-    // Update marker highlights
     markers.selectAll('.slider-marker-circle')
       .transition()
       .duration(300)
       .attr('class', d => d === currentDistance ? 'slider-marker-circle active' : 'slider-marker-circle');
   }
 
-  // Load data
   d3.csv(dataPath).then(data => {
     allData = data;
     console.log(`Distance slider loaded ${data.length} rows`);
