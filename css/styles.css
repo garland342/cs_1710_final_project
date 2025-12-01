@@ -79,9 +79,10 @@ body {
 }
 
 #reset-button {
-    position: absolute;
-    top: 30px;
-    left: 30px;
+    position: fixed;
+    top: 120px;
+    left: 50%;
+    transform: translateX(-50%);
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
@@ -97,7 +98,7 @@ body {
 }
 
 #reset-button:hover {
-    transform: translateY(-2px);
+    transform: translateX(-50%) translateY(-2px);
     box-shadow: 0 6px 12px rgba(0,0,0,0.15);
 }
 
@@ -130,34 +131,114 @@ body {
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     padding: 0;
-    height: fit-content;
-    position: sticky;
-    top: 30px;
+    height: 100%;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 #info-panel.hidden {
     display: none;
 }
 
+.view-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    flex: 1;
+}
+
+.view-container.hidden {
+    display: none;
+}
+
 .panel-header {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 25px;
+    padding: 20px;
+    flex-shrink: 0;
 }
 
 .panel-header h2 {
-    font-size: 28px;
-    margin-bottom: 5px;
+    font-size: 24px;
+    margin-bottom: 3px;
 }
 
 .panel-header .subtitle {
-    font-size: 14px;
+    font-size: 13px;
     opacity: 0.9;
 }
 
-.panel-content {
-    padding: 25px;
+/* Instructions Container */
+.instructions-container {
+    display: none !important;
+}
+
+/* Chart Toggle */
+#chart-toggle-container {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #e0e0e0;
+    flex-shrink: 0;
+}
+
+#chart-toggle-container.hidden {
+    display: none;
+}
+
+.chart-toggle-btn {
+    padding: 6px 12px;
+    border: 2px solid #667eea;
+    background: white;
+    color: #667eea;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 11px;
+    transition: all 0.3s;
+}
+
+.chart-toggle-btn.active {
+    background: #667eea;
+    color: white;
+}
+
+.chart-toggle-btn:hover {
+    background: #667eea;
+    color: white;
+}
+
+/* National View - Bar Charts Only */
+#national-view-container .bar-charts-container {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+#national-view-container #bar-chart-1,
+#national-view-container #bar-chart-2 {
+    min-height: 280px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 8px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* State View Styles */
+#state-view-container .panel-content {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
 }
 
 /* Metric Selector Dropdown */
@@ -1008,7 +1089,6 @@ p, li {
 
 /* Bar chart bars - default for regular charts */
 .bar {
-  fill: #667eea;  /* Solid purple for regular bar charts */
   transition: fill 0.3s;
 }
 
@@ -1110,7 +1190,7 @@ p, li {
 .carousel-container {
     width: 100%;
     height: 100vh;
-    position: relative;
+    position: static;
     overflow: hidden;
     background: #f5f7fa;
 }
@@ -1275,42 +1355,6 @@ p, li {
 }
 
 /* Slide 5: Food Insecurity Charts */
-.slide-5 {
-    padding: 40px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-}
-
-.slide-5 .new-section-header {
-    margin: 0 0 30px 0;
-    padding: 0;
-}
-
-.slide-5 main.split-layout {
-    width: 100%;
-    max-width: 1400px;
-}
-
-/* Slide 6: Depression Charts */
-.slide-6 {
-    padding: 40px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-}
-
-.slide-6 .new-section-header {
-    margin: 0 0 30px 0;
-    padding: 0;
-}
-
-.slide-6 main.split-layout {
-    width: 100%;
-    max-width: 1400px;
-}
 
 /* Slide 7: Community Orgs */
 .slide-7 {
@@ -1347,11 +1391,11 @@ p, li {
     align-items: center;
     gap: 30px;
     z-index: 1000;
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.2);
     padding: 20px 30px;
     border-radius: 50px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(10px);
+    /* backdrop-filter: blur(5px); */
 }
 
 /* Navigation Buttons */
@@ -1405,17 +1449,20 @@ p, li {
     cursor: pointer;
     transition: all 0.3s ease;
     border: 2px solid transparent;
+    opacity: 0.5;
 }
 
 .indicator:hover {
     background: #b0b0b0;
     transform: scale(1.2);
+    opacity: 0.7;
 }
 
 .indicator.active {
     background: #667eea;
     width: 32px;
     border-radius: 5px;
+    opacity: 1;
 }
 
 /* Responsive Design */
@@ -1514,5 +1561,364 @@ p, li {
 
     .carousel-slide {
         padding: 20px 10px !important;
+    }
+}
+
+/* ============================================
+   DUAL MAP WITH SIDE PANEL STYLES - EQUAL HEIGHTS
+   ============================================ */
+
+#dual-map-wrapper {
+    max-width: 1900px;
+    margin: 30px auto;
+    padding: 0 20px;
+    position: relative;
+}
+
+/* THREE COLUMN LAYOUT - EQUAL HEIGHTS */
+#dual-map-container-with-panel {
+    display: grid;
+    grid-template-columns: 1fr 1fr 400px;
+    gap: 20px;
+    align-items: stretch; /* Makes all columns equal height */
+}
+
+.map-section {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 20px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column; /* Stack header and content vertically */
+}
+
+.map-header-section {
+    margin-bottom: 15px;
+    text-align: center;
+    flex-shrink: 0; /* Don't shrink header */
+}
+
+.map-header-section h3 {
+    font-size: 1.3rem;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+/* Styled headers matching right panel */
+.map-header-section-styled {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+.map-header-section-styled h3 {
+    color: white;
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+/* Metric selector wrapper - positioned below header */
+.metric-selector-wrapper {
+    background: white;
+    padding: 15px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    flex-shrink: 0;
+}
+
+.map-subtitle {
+    font-size: 0.9rem;
+    color: #6c757d;
+    font-style: italic;
+    margin: 0;
+}
+
+.map-content {
+    position: relative;
+    flex: 1; /* Takes up remaining space */
+    display: flex;
+    flex-direction: column;
+}
+
+#map-left,
+#map-right {
+    position: relative;
+    width: 100%;
+    flex: 1; /* Map takes up available space */
+    min-height: 500px;
+}
+
+#map-left svg,
+#map-right svg {
+    width: 100%;
+    height: 100%;
+}
+
+.state {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.state:hover {
+    stroke: #667eea;
+    stroke-width: 2px;
+}
+
+.county {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.county:hover {
+    stroke: #667eea;
+    stroke-width: 2px;
+    opacity: 0.8;
+}
+
+.state-boundary {
+    fill: none;
+    stroke: #333;
+    stroke-width: 2px;
+    pointer-events: none;
+}
+
+/* Metric Selector in Map Header */
+.map-header-section .metric-selector {
+    margin-top: 10px;
+}
+
+.metric-selector-wrapper .metric-selector {
+    margin: 0;
+}
+
+.map-header-section .metric-selector label,
+.metric-selector-wrapper .metric-selector label {
+    display: inline-block;
+    font-weight: 600;
+    color: #495057;
+    margin-right: 8px;
+    font-size: 14px;
+}
+
+.map-header-section .metric-selector select,
+.metric-selector-wrapper .metric-selector select {
+    padding: 8px 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #2c3e50;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.map-header-section .metric-selector select:hover,
+.metric-selector-wrapper .metric-selector select:hover {
+    border-color: #667eea;
+}
+
+.map-header-section .metric-selector select:focus,
+.metric-selector-wrapper .metric-selector select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Legends for each map */
+#legend-left,
+#legend-right {
+    margin-top: 15px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    flex-shrink: 0; /* Don't shrink legends */
+}
+
+#legend-left h4,
+#legend-right h4 {
+    margin-bottom: 8px;
+    color: #495057;
+    font-size: 13px;
+    text-align: center;
+}
+
+/* Info Panel - Same Height as Maps */
+#dual-map-wrapper #info-panel {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Show info panel by default, just change content */
+#dual-map-wrapper #info-panel.hidden .panel-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+}
+
+/* Comparison Cards - Stack vertically for side panel */
+.comparison-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.comparison-card {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.comparison-card h4 {
+    color: #667eea;
+    margin-bottom: 12px;
+    font-size: 15px;
+}
+
+.comparison-card.food-insecurity {
+    border-left-color: #3498db;
+}
+
+.comparison-card.food-insecurity h4 {
+    color: #3498db;
+}
+
+.comparison-card.comparison-metric {
+    border-left-color: #e74c3c;
+}
+
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.stat-row:last-child {
+    border-bottom: none;
+}
+
+.stat-row .label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 12px;
+}
+
+.stat-row .value {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* Distribution Charts Container - Stack vertically */
+.distribution-charts {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.distribution-chart-section {
+    background: #f8f9fa;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.distribution-chart-section h4 {
+    color: #667eea;
+    margin-bottom: 8px;
+    font-size: 13px;
+    text-align: center;
+}
+
+/* Instruction Text - Centered in info panel when no state selected */
+.instruction {
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.instruction svg {
+    width: 64px;
+    height: 64px;
+    opacity: 0.3;
+}
+
+.instruction p {
+    margin: 0;
+    font-size: 14px;
+}
+
+/* Responsive Design */
+@media (max-width: 1600px) {
+    #dual-map-container-with-panel {
+        grid-template-columns: 1fr 1fr 350px;
+    }
+    
+    #map-left,
+    #map-right {
+        min-height: 450px;
+    }
+}
+
+@media (max-width: 1400px) {
+    #dual-map-container-with-panel {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .map-section {
+        height: auto; /* Reset height for stacked layout */
+    }
+    
+    #dual-map-wrapper #info-panel {
+        position: relative;
+        max-height: none;
+        top: 0;
+        height: auto;
+    }
+    
+    .comparison-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+    
+    .distribution-charts {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    #map-left,
+    #map-right {
+        min-height: 400px;
+    }
+    
+    .comparison-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .distribution-charts {
+        grid-template-columns: 1fr;
     }
 }

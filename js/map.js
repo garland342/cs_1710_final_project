@@ -20,7 +20,7 @@ const COMPARISON_METRICS = [
 // STATE
 // ============================================
 
-let currentComparisonMetric = COMPARISON_METRICS[0].value;
+let currentComparisonMetric = COMPARISON_METRICS[1].value;
 let isZoomed = false;
 let currentStateName = null;
 let currentStateData = null;
@@ -31,6 +31,31 @@ let globalData = {
     stateFeatures: null,
     countyFeatures: null,
     dataByState: null
+};
+
+// Bar charts state
+let barChartsData = {
+    stateLevel: null,
+    regionalLevel: null,
+    currentView: 'state',
+    currentMetric: 'DEPRESSION_CrudePrev'  // Track which metric is selected
+};
+
+// State to region mapping
+const stateToRegion = {
+    'Connecticut': 'Northeast', 'Maine': 'Northeast', 'Massachusetts': 'Northeast', 'New Hampshire': 'Northeast',
+    'New Jersey': 'Northeast', 'New York': 'Northeast', 'Pennsylvania': 'Northeast', 'Rhode Island': 'Northeast',
+    'Vermont': 'Northeast', 'Delaware': 'Northeast', 'Maryland': 'Northeast', 'District of Columbia': 'Northeast',
+    'Illinois': 'Midwest', 'Indiana': 'Midwest', 'Michigan': 'Midwest', 'Ohio': 'Midwest',
+    'Wisconsin': 'Midwest', 'Iowa': 'Midwest', 'Kansas': 'Midwest', 'Minnesota': 'Midwest',
+    'Missouri': 'Midwest', 'Nebraska': 'Midwest', 'North Dakota': 'Midwest', 'South Dakota': 'Midwest',
+    'Alabama': 'South', 'Arkansas': 'South', 'Florida': 'South', 'Georgia': 'South',
+    'Kentucky': 'South', 'Louisiana': 'South', 'Mississippi': 'South', 'North Carolina': 'South',
+    'South Carolina': 'South', 'Tennessee': 'South', 'Texas': 'South', 'Virginia': 'South',
+    'West Virginia': 'South', 'Oklahoma': 'South', 'Arizona': 'West', 'Colorado': 'West',
+    'Idaho': 'West', 'Montana': 'West', 'Nevada': 'West', 'New Mexico': 'West',
+    'Utah': 'West', 'Wyoming': 'West', 'Alaska': 'West', 'California': 'West',
+    'Hawaii': 'West', 'Oregon': 'West', 'Washington': 'West'
 };
 
 // ============================================
@@ -103,7 +128,7 @@ function formatValue(value, formatString) {
 }
 
 function getComparisonMetricInfo(metricValue) {
-    return COMPARISON_METRICS.find(m => m.value === metricValue) || COMPARISON_METRICS[0];
+    return COMPARISON_METRICS.find(m => m.value === metricValue) || COMPARISON_METRICS[1];
 }
 
 function getMetricLabel(metric) {
@@ -210,7 +235,8 @@ function zoomToBothMaps(stateFeature, stateName) {
     // Update legends
     updateLegends();
     
-    // Show info panel with data
+    // Hide bar charts and show state-specific info
+    hideBarCharts();
     showComparisonInfo(stateName);
 }
 
@@ -220,10 +246,25 @@ function drawCountiesOnMap(countyGroup, stateName, metric, colorScheme) {
         d.id.substring(0, 2) === stateFips
     );
 
-    const values = currentStateData.map(d => +d[metric]).filter(v => !isNaN(v));
+    const values = currentStateData
+        .map(d => {
+            const val = d[metric];
+            // Handle both empty strings and non-numeric values
+            return (val === '' || val === undefined || val === null) ? NaN : +val;
+        })
+        .filter(v => !isNaN(v));
+    
+    const hasValidData = values.length > 0;
+    
+    console.log(`Drawing ${stateName} with ${metric}: found ${values.length} valid values out of ${currentStateData.length} counties`);
+    
     const colorScale = d3.scaleSequential()
-        .domain(d3.extent(values))
+        .domain(hasValidData ? d3.extent(values) : [0, 1])
         .interpolator(colorScheme);
+
+    // Store in window so updateLegends can access it
+    window.currentLegendMetric = metric;
+    window.currentLegendHasData = hasValidData;
 
     const countyDataMap = new Map();
     currentStateData.forEach(d => {
@@ -238,6 +279,11 @@ function drawCountiesOnMap(countyGroup, stateName, metric, colorScheme) {
         .attr("class", "county")
         .attr("d", path)
         .attr("fill", d => {
+            // If state has no valid data for this metric, always return gray
+            if (!hasValidData) {
+                return "#e0e0e0";
+            }
+            
             const countyTopoName = d.properties && d.properties.name ? 
                 d.properties.name.toLowerCase() : '';
             let matchingData = null;
@@ -321,7 +367,7 @@ function resetBothMaps() {
     currentStateData = null;
 
     d3.select("#reset-button").classed("visible", false);
-    d3.select("#info-panel").classed("hidden", true);
+    d3.select("#info-panel").classed("hidden", false);
 
     // Clear counties
     countyGroupLeft.selectAll("*").transition().duration(300).style("opacity", 0)
@@ -340,13 +386,14 @@ function resetBothMaps() {
     // Reset legends
     updateLegends();
 
-    // Show default instruction in info panel
+    // Show default instruction in info panel and bar charts
     showDefaultInstruction();
+    showBarCharts();
 }
 
 function showDefaultInstruction() {
-    d3.select("#state-name-header").text("Select State");
-    d3.select("#county-count-subtitle").text("Click a state to view data");
+    d3.select("#state-name-header").text("National");
+    d3.select("#county-count-subtitle").text("See nationwide statistics below");
     
     const content = d3.select("#info-content");
     content.html(`
@@ -398,7 +445,12 @@ function showComparisonInfo(stateName) {
 }
 
 function addStatRows(container, metric) {
-    const values = currentStateData.map(d => +d[metric]).filter(v => !isNaN(v));
+    const values = currentStateData
+        .map(d => {
+            const val = d[metric];
+            return (val === '' || val === undefined || val === null) ? NaN : +val;
+        })
+        .filter(v => !isNaN(v));
 
     const stats = [
         { label: "Average", value: d3.mean(values) },
@@ -410,7 +462,8 @@ function addStatRows(container, metric) {
     stats.forEach(stat => {
         const row = container.append("div").attr("class", "stat-row");
         row.append("div").attr("class", "label").text(stat.label);
-        row.append("div").attr("class", "value").text(formatValue(stat.value, ".2f"));
+        const valueText = isNaN(stat.value) ? "No Data" : formatValue(stat.value, ".2f");
+        row.append("div").attr("class", "value").text(valueText);
     });
 }
 
@@ -502,6 +555,7 @@ function getMetricColor(metric) {
 
 function onComparisonMetricChange(newMetric) {
     currentComparisonMetric = newMetric;
+    barChartsData.currentMetric = newMetric;
 
     if (isZoomed && currentStateName && currentStateData) {
         // Update right map counties
@@ -513,9 +567,13 @@ function onComparisonMetricChange(newMetric) {
         updateLegends();
         showComparisonInfo(currentStateName);
     } else {
-        // Update right map states
+        // Update right map states and bar charts
         updateRightMapStates();
         updateLegends();
+        // Update bar charts if in national view
+        if (!isZoomed) {
+            showBarCharts();
+        }
     }
 }
 
@@ -555,20 +613,42 @@ function updateRightMapStates() {
 function updateLegends() {
     if (isZoomed) {
         // County-level legends
-        const leftValues = currentStateData.map(d => +d[BASELINE_METRIC]).filter(v => !isNaN(v));
-        const rightValues = currentStateData.map(d => +d[currentComparisonMetric]).filter(v => !isNaN(v));
+        const leftValues = currentStateData
+            .map(d => {
+                const val = d[BASELINE_METRIC];
+                return (val === '' || val === undefined || val === null) ? NaN : +val;
+            })
+            .filter(v => !isNaN(v));
         
-        const leftColorScale = d3.scaleSequential()
-            .domain(d3.extent(leftValues))
-            .interpolator(d3.interpolateBlues);
+        const rightValues = currentStateData
+            .map(d => {
+                const val = d[currentComparisonMetric];
+                return (val === '' || val === undefined || val === null) ? NaN : +val;
+            })
+            .filter(v => !isNaN(v));
         
-        const rightColorScale = d3.scaleSequential()
-            .domain(d3.extent(rightValues))
-            .interpolator(getComparisonMetricInfo(currentComparisonMetric).colorScheme);
+        // Check if we have data for each metric
+        const hasLeftData = leftValues.length > 0;
+        const hasRightData = rightValues.length > 0;
         
-        createLegend("#legend-left", leftColorScale, leftValues, "Food Insecurity Rate (Unadjusted %)");
-        createLegend("#legend-right", rightColorScale, rightValues, 
-            getComparisonMetricInfo(currentComparisonMetric).label);
+        if (!hasLeftData) {
+            d3.select("#legend-left").html('<h4>No data available</h4>');
+        } else {
+            const leftColorScale = d3.scaleSequential()
+                .domain(d3.extent(leftValues))
+                .interpolator(d3.interpolateBlues);
+            createLegend("#legend-left", leftColorScale, leftValues, "Food Insecurity Rate (Unadjusted %)");
+        }
+        
+        if (!hasRightData) {
+            d3.select("#legend-right").html('<h4>No data available</h4>');
+        } else {
+            const rightColorScale = d3.scaleSequential()
+                .domain(d3.extent(rightValues))
+                .interpolator(getComparisonMetricInfo(currentComparisonMetric).colorScheme);
+            createLegend("#legend-right", rightColorScale, rightValues, 
+                getComparisonMetricInfo(currentComparisonMetric).label);
+        }
     } else {
         // State-level legends
         const leftStateAvg = d3.rollup(
@@ -706,6 +786,242 @@ function drawStatesOnBothMaps() {
 }
 
 // ============================================
+// BAR CHARTS FOR NATIONAL VIEW
+// ============================================
+
+function calculateBarChartsData(csvData) {
+    // Calculate state-level data
+    const stateAverages = d3.rollup(
+        csvData,
+        v => ({
+            foodInsecurity: d3.mean(v, d => +d['FOODINSECU_CrudePrev']),
+            depression: d3.mean(v, d => +d['DEPRESSION_CrudePrev']),
+            diabetes: d3.mean(v, d => +d['DIABETES_CrudePrev']),
+            bphigh: d3.mean(v, d => +d['BPHIGH_CrudePrev'])
+        }),
+        d => d['StateDesc']
+    );
+
+    // Create separate top 10 arrays for each metric
+    const allStates = Array.from(stateAverages, ([state, values]) => ({
+        name: state,
+        foodInsecurity: values.foodInsecurity,
+        depression: values.depression,
+        diabetes: values.diabetes,
+        bphigh: values.bphigh
+    }));
+
+    // Top 10 by Food Insecurity
+    const top10FoodInsecurity = [...allStates]
+        .sort((a, b) => b.foodInsecurity - a.foodInsecurity)
+        .slice(0, 10);
+
+    // Top 10 by Depression
+    const top10Depression = [...allStates]
+        .sort((a, b) => b.depression - a.depression)
+        .slice(0, 10);
+
+    // Top 10 by Diabetes
+    const top10Diabetes = [...allStates]
+        .sort((a, b) => b.diabetes - a.diabetes)
+        .slice(0, 10);
+
+    // Top 10 by High Blood Pressure
+    const top10BP = [...allStates]
+        .sort((a, b) => b.bphigh - a.bphigh)
+        .slice(0, 10);
+
+    // Calculate regional data
+    const regionAverages = d3.rollup(
+        csvData,
+        v => ({
+            foodInsecurity: d3.mean(v, d => +d['FOODINSECU_CrudePrev']),
+            depression: d3.mean(v, d => +d['DEPRESSION_CrudePrev']),
+            diabetes: d3.mean(v, d => +d['DIABETES_CrudePrev']),
+            bphigh: d3.mean(v, d => +d['BPHIGH_CrudePrev'])
+        }),
+        d => stateToRegion[d['StateDesc']] || 'Unknown'
+    );
+
+    const allRegions = Array.from(regionAverages, ([region, values]) => ({
+        name: region,
+        foodInsecurity: values.foodInsecurity,
+        depression: values.depression,
+        diabetes: values.diabetes,
+        bphigh: values.bphigh
+    }));
+
+    // Separate regional arrays sorted by each metric
+    const regionalDataByFoodInsecurity = [...allRegions]
+        .sort((a, b) => b.foodInsecurity - a.foodInsecurity);
+
+    const regionalDataByDepression = [...allRegions]
+        .sort((a, b) => b.depression - a.depression);
+
+    const regionalDataByDiabetes = [...allRegions]
+        .sort((a, b) => b.diabetes - a.diabetes);
+
+    const regionalDataByBP = [...allRegions]
+        .sort((a, b) => b.bphigh - a.bphigh);
+
+    barChartsData.stateLevel = top10FoodInsecurity;
+    barChartsData.stateLevelByMetric = {
+        'FOODINSECU_CrudePrev': top10FoodInsecurity,
+        'DEPRESSION_CrudePrev': top10Depression,
+        'DIABETES_CrudePrev': top10Diabetes,
+        'BPHIGH_CrudePrev': top10BP
+    };
+    barChartsData.regionalLevel = regionalDataByFoodInsecurity;
+    barChartsData.regionalLevelByMetric = {
+        'FOODINSECU_CrudePrev': regionalDataByFoodInsecurity,
+        'DEPRESSION_CrudePrev': regionalDataByDepression,
+        'DIABETES_CrudePrev': regionalDataByDiabetes,
+        'BPHIGH_CrudePrev': regionalDataByBP
+    };
+}
+
+function createBarChart(containerId, data, metric, title, colorScheme) {
+    const container = d3.select(containerId);
+    container.html('');
+
+    const margin = { top: 30, right: 15, left: 50, bottom: 50 };
+    const width = 280 - margin.left - margin.right;
+    const height = 250 - margin.top - margin.bottom;
+
+    const svg = container.append('svg')
+        .attr('width', '100%')
+        .attr('height', height + margin.top + margin.bottom)
+        .attr('viewBox', `0 0 280 ${height + margin.top + margin.bottom}`)
+        .attr('preserveAspectRatio', 'xMidYMid meet');
+
+    const g = svg.append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
+
+    const x = d3.scaleBand()
+        .domain(data.map(d => d.name))
+        .range([0, width])
+        .padding(0.3);
+
+    const y = d3.scaleLinear()
+        .domain([0, d3.max(data, d => d[metric])])
+        .range([height, 0]);
+
+    const color = d3.scaleSequential()
+        .domain([0, d3.max(data, d => d[metric])])
+        .interpolator(colorScheme);
+
+    // Bars
+    g.selectAll('.bar')
+        .data(data)
+        .join('rect')
+        .attr('class', 'bar')
+        .attr('x', d => x(d.name))
+        .attr('y', d => y(d[metric]))
+        .attr('width', x.bandwidth())
+        .attr('height', d => height - y(d[metric]))
+        .attr('fill', d => color(d[metric]))
+        .attr('rx', 3);
+
+    // X-axis
+    g.append('g')
+        .attr('transform', `translate(0,${height})`)
+        .call(d3.axisBottom(x))
+        .selectAll('text')
+        .attr('transform', 'rotate(-45)')
+        .style('font-size', '9px')
+        .style('text-anchor', 'end');
+
+    // Y-axis
+    g.append('g')
+        .call(d3.axisLeft(y).ticks(4))
+        .selectAll('text')
+        .style('font-size', '9px');
+
+    // Title
+    svg.append('text')
+        .attr('x', 140)
+        .attr('y', 12)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '11px')
+        .style('font-weight', 'bold')
+        .text(title);
+
+    // Y-axis label
+    svg.append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', 5)
+        .attr('x', -(height + margin.top) / 2)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '8px')
+        .style('fill', '#666')
+        .text('Rate (%)');
+}
+
+function showBarCharts() {
+    d3.select('#national-view-container').classed('hidden', false);
+    d3.select('#state-view-container').classed('hidden', true);
+    d3.select('#reset-button').classed('visible', false);
+
+    // Food Insecurity always uses its own top 10
+    let foodInsecurityData;
+    if (barChartsData.currentView === 'state') {
+        foodInsecurityData = barChartsData.stateLevelByMetric['FOODINSECU_CrudePrev'];
+    } else {
+        foodInsecurityData = barChartsData.regionalLevelByMetric['FOODINSECU_CrudePrev'];
+    }
+
+    // Get the appropriate top 10 array for the health metric
+    let healthMetricData;
+    if (barChartsData.currentView === 'state') {
+        healthMetricData = barChartsData.stateLevelByMetric[barChartsData.currentMetric] || barChartsData.stateLevel;
+    } else {
+        healthMetricData = barChartsData.regionalLevelByMetric[barChartsData.currentMetric] || barChartsData.regionalLevel;
+    }
+
+    // Determine which metric to display based on currentMetric
+    let secondMetric, secondLabel, secondColorScheme;
+    
+    if (barChartsData.currentMetric === 'DEPRESSION_CrudePrev') {
+        secondMetric = 'depression';
+        secondLabel = 'Depression Rate';
+        secondColorScheme = d3.interpolatePurples;
+    } else if (barChartsData.currentMetric === 'DIABETES_CrudePrev') {
+        secondMetric = 'diabetes';
+        secondLabel = 'Diabetes Rate';
+        secondColorScheme = d3.interpolateReds;
+    } else if (barChartsData.currentMetric === 'BPHIGH_CrudePrev') {
+        secondMetric = 'bphigh';
+        secondLabel = 'High Blood Pressure Rate';
+        secondColorScheme = d3.interpolateGreens;
+    }
+
+    createBarChart('#bar-chart-1', foodInsecurityData, 'foodInsecurity', 'Food Insecurity Rate', d3.interpolateBlues);
+    createBarChart('#bar-chart-2', healthMetricData, secondMetric, secondLabel, secondColorScheme);
+}
+
+function hideBarCharts() {
+    d3.select('#national-view-container').classed('hidden', true);
+    d3.select('#state-view-container').classed('hidden', false);
+    d3.select('#reset-button').classed('visible', true);
+}
+
+function setupBarChartToggles() {
+    d3.select('#state-level-toggle').on('click', function() {
+        barChartsData.currentView = 'state';
+        d3.selectAll('.chart-toggle-btn').classed('active', false);
+        d3.select(this).classed('active', true);
+        showBarCharts();
+    });
+
+    d3.select('#regional-toggle').on('click', function() {
+        barChartsData.currentView = 'regional';
+        d3.selectAll('.chart-toggle-btn').classed('active', false);
+        d3.select(this).classed('active', true);
+        showBarCharts();
+    });
+}
+
+// ============================================
 // LOAD DATA AND INITIALIZE
 // ============================================
 
@@ -722,11 +1038,15 @@ Promise.all([
     globalData.countyFeatures = topojson.feature(countiesTopology, countiesTopology.objects.counties);
     globalData.dataByState = d3.group(csvData, d => d[STATE_COLUMN]);
     
+    // Calculate bar charts data
+    calculateBarChartsData(csvData);
+    
     // Draw initial state views
     drawStatesOnBothMaps();
     
-    // Show default instruction in info panel
+    // Show default instruction in info panel and bar charts
     showDefaultInstruction();
+    showBarCharts();
     
     // Setup event listeners
     d3.select("#comparison-metric-select").on("change", function() {
@@ -734,6 +1054,9 @@ Promise.all([
     });
 
     d3.select("#reset-button").on("click", resetBothMaps);
+    
+    // Setup bar chart toggles
+    setupBarChartToggles();
     
 }).catch(error => {
     console.error("Error loading data:", error);

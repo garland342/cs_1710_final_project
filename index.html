@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>US State Map Visualization</title>
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/dual-map.css">
 </head>
 <body>
+    <!-- RESET BUTTON - Outside carousel for fixed positioning -->
+    <button id="reset-button">← Back to National View</button>
+    
     <div class="carousel-container">
         <div class="carousel-wrapper">
             
@@ -72,13 +74,12 @@
                 </div>
                 
                 <div id="dual-map-wrapper">
-                    <button id="reset-button">← Back to National View</button>
                     
                     <div id="dual-map-container-with-panel">
                         
                         <!-- LEFT MAP: Food Insecurity (Fixed) -->
                         <div class="map-section">
-                            <div class="map-header-section">
+                            <div class="map-header-section map-header-section-styled">
                                 <h3>Food Insecurity Across the Nation</h3>
                             </div>
                             <div class="map-content">
@@ -89,13 +90,15 @@
 
                         <!-- RIGHT MAP: Selectable Metrics -->
                         <div class="map-section">
-                            <div class="map-header-section">
+                            <div class="map-header-section map-header-section-styled">
                                 <h3>Health Metric Comparison</h3>
+                            </div>
+                            <div class="metric-selector-wrapper">
                                 <div class="metric-selector">
                                     <label for="comparison-metric-select">Compare with:</label>
                                     <select id="comparison-metric-select">
-                                        <option value="DIABETES_CrudePrev" selected>Diabetes</option>
-                                        <option value="DEPRESSION_CrudePrev">Depression</option>
+                                        <option value="DEPRESSION_CrudePrev" selected>Depression</option>
+                                        <option value="DIABETES_CrudePrev">Diabetes</option>
                                         <option value="BPHIGH_CrudePrev">High Blood Pressure</option>
                                     </select>
                                 </div>
@@ -112,13 +115,22 @@
                                 <h2 id="state-name-header">Select State</h2>
                                 <div class="subtitle" id="county-count-subtitle">Click a state to view data</div>
                             </div>
-                            <div class="panel-content" id="info-content">
-                                <div class="instruction">
-                                    <svg viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                                    </svg>
-                                    <p>Click on a state to view detailed statistics and county-level data</p>
+                            
+                            <!-- NATIONAL VIEW - Bar charts only -->
+                            <div id="national-view-container" class="view-container">
+                                <div id="chart-toggle-container" class="chart-toggle">
+                                    <button id="state-level-toggle" class="chart-toggle-btn active" data-view="state">State-Level</button>
+                                    <button id="regional-toggle" class="chart-toggle-btn" data-view="regional">Regional</button>
                                 </div>
+                                <div class="bar-charts-container">
+                                    <div id="bar-chart-1"></div>
+                                    <div id="bar-chart-2"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- STATE VIEW - Data summary and county charts -->
+                            <div id="state-view-container" class="view-container hidden">
+                                <div class="panel-content" id="info-content"></div>
                             </div>
                         </div>
                         
@@ -127,45 +139,7 @@
             </section>
 
             <!-- ============================================ -->
-            <!-- SLIDE 5: FOOD INSECURITY CHARTS -->
-            <!-- ============================================ -->
-            <section class="carousel-slide slide-5">
-                <section class="new-section-header">
-                    <p>The Epicenters of Food Insecurity</p>
-                </section>
-
-                <main class="split-layout split-layout-top-section">
-                    <section class="left-section">
-                        <h2>The Epicenters of Food Insecurity</h2>
-                    </section>
-
-                    <section class="right-section">
-                        <h2>The Regional Prevalence of Scarcity</h2>
-                    </section>
-                </main>
-            </section>
-
-            <!-- ============================================ -->
-            <!-- SLIDE 6: DEPRESSION CHARTS -->
-            <!-- ============================================ -->
-            <section class="carousel-slide slide-6">
-                <section class="new-section-header">
-                    <p>The Other Side of Scarcity: Tracking Depression Across America</p>
-                </section>
-
-                <main class="split-layout split-layout-bottom">
-                    <section class="left-section" id="depression-bar-chart-container">
-                        <h2>The Depression Landscape: America's Most Vulnerable States</h2>
-                    </section>
-
-                    <section class="right-section" id="depression-map-container">
-                        <h2>Regional Patterns of Strain</h2>
-                    </section>
-                </main>
-            </section>
-
-            <!-- ============================================ -->
-            <!-- SLIDE 7: COMMUNITY ORGANIZATIONS -->
+            <!-- SLIDE 5: COMMUNITY ORGANIZATIONS -->
             <!-- ============================================ -->
             <section class="carousel-slide slide-7">
                 <section class="new-section-header">
@@ -192,8 +166,6 @@
                 <span class="indicator" data-slide="2" aria-label="Slide 3"></span>
                 <span class="indicator" data-slide="3" aria-label="Slide 4"></span>
                 <span class="indicator" data-slide="4" aria-label="Slide 5"></span>
-                <span class="indicator" data-slide="5" aria-label="Slide 6"></span>
-                <span class="indicator" data-slide="6" aria-label="Slide 7"></span>
             </div>
             <button class="carousel-btn next-btn" aria-label="Next slide">Next →</button>
         </div>
