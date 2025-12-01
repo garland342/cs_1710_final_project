@@ -754,14 +754,16 @@ p, li {
 
 /* Styling for the Voronoi container */
 #voronoi-container {
-  max-width: 1200px;
+  max-width: 100%;
+  width: 100%;
   margin: 20px auto; 
   display: flex; 
   justify-content: center;
   align-items: center;
-  min-height: 400px; 
-  background-color: #f9f9f9; 
-  border: 1px solid #e0e0e0;
+  min-height: 600px; 
+  background-color: transparent; 
+  border: none;
+  padding: 20px;
 }
 
 /* Voronoi instruction text */
@@ -937,9 +939,10 @@ p, li {
 /* Distance Slider Visualization Styles */
 
 .slider-wrapper {
-  max-width: 900px;
+  max-width: 100%;
+  width: 100%;
   margin: 0 auto;
-  padding: 1rem 0;
+  padding: 2rem 2rem;
   background: transparent;
   border-radius: 0;
   box-shadow: none;
@@ -1006,28 +1009,31 @@ p, li {
 }
 
 .slider-tract-count {
-  font-size: 56px;
+  font-size: 72px;
   font-weight: 700;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   line-height: 1.2;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 }
 
 .slider-distance-label {
-  font-size: 18px;
+  font-size: 22px;
   color: #2c3e50;
   font-weight: 500;
+  margin-top: 5px;
 }
 
 /* Slider SVG */
 .slider-svg {
   width: 100%;
+  max-width: 100%;
   height: auto;
+  min-height: 120px;
   display: block;
-  margin-bottom: 2rem;
+  margin: 2rem auto;
 }
 
 .slider-track {
@@ -1082,9 +1088,11 @@ p, li {
 /* Bar Chart */
 .bar-chart-svg {
   width: 100%;
+  max-width: 100%;
   height: auto;
+  min-height: 350px;
   display: block;
-  margin-bottom: 2rem;
+  margin: 2rem auto;
 }
 
 /* Bar chart bars - default for regular charts */
@@ -1301,7 +1309,7 @@ p, li {
 
 /* Slide 3: Distance Slider */
 .slide-3 {
-    padding: 40px 20px;
+    padding: 40px 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1311,15 +1319,17 @@ p, li {
 
 .slide-3 .geography-section {
     margin: 0 0 40px 0;
-    padding: 20px 40px;
+    padding: 20px 20px;
     flex-shrink: 0;
+    width: 100%;
 }
 
 .slide-3 #distance-slider-container {
     width: 100%;
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
     flex-shrink: 0;
+    padding: 0 20px;
 }
 
 /* Slide 4: Dual Maps */
@@ -1377,8 +1387,9 @@ p, li {
 
 .slide-7 #voronoi-container {
     width: 100%;
-    max-width: 1200px;
+    max-width: 100%;
     flex: 1;
+    background: transparent;
 }
 
 /* Carousel Navigation Controls */

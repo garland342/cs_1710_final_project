@@ -15,8 +15,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const container = d3.select("#voronoi-container");
     const containerRect = container.node().getBoundingClientRect();
-    const width = containerRect.width > 0 ? containerRect.width : 800; 
-    const height = 500; 
+    const width = containerRect.width > 0 ? containerRect.width : window.innerWidth - 100; 
+    const height = 700; 
 
     const svg = container.append("svg")
       .attr("width", width)
@@ -26,14 +26,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const clipPath = defs.append("clipPath")
       .attr("id", "circle-clip");
     clipPath.append("circle")
-      .attr("r", 80)
+      .attr("r", 120)
       .attr("cx", 0)
       .attr("cy", 0);
 
     const cols = 4;
     const rows = 2;
-    const circleRadius = 80;
-    const spacing = 50;
+    const circleRadius = 120;
+    const spacing = 60;
     const startX = (width - (cols * (circleRadius * 2 + spacing) - spacing)) / 2;
     const startY = (height - (rows * (circleRadius * 2 + spacing) - spacing)) / 2;
 
@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
           g.append("circle")
             .attr("r", circleRadius)
             .attr("fill", "#e0e0e0")
-            .attr("stroke", "#ccc")
+      .attr("stroke", "#ccc")
             .attr("stroke-width", 2);
           g.append("text")
             .attr("text-anchor", "middle")
@@ -146,20 +146,20 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Initialize spiral visualization with delay to ensure DOM is ready
     setTimeout(() => {
-      const spiralContainer = document.getElementById('spiral-container');
-      if (spiralContainer) {
+    const spiralContainer = document.getElementById('spiral-container');
+    if (spiralContainer) {
         console.log('Initializing spiral visualization');
-        createSpiralVisualization('#spiral-container', 'data/food_access.csv');
-      }
+      createSpiralVisualization('#spiral-container', 'data/food_access.csv');
+    }
     }, 100);
 
     // Initialize distance slider with delay to ensure DOM is ready
     setTimeout(() => {
-      const sliderContainer = document.getElementById('distance-slider-container');
-      if (sliderContainer) {
+    const sliderContainer = document.getElementById('distance-slider-container');
+    if (sliderContainer) {
         console.log('Initializing distance slider');
-        createDistanceSlider('#distance-slider-container', 'data/food_access.csv');
-      }
+      createDistanceSlider('#distance-slider-container', 'data/food_access.csv');
+    }
     }, 150);
 
   } else {
@@ -342,8 +342,8 @@ function createSpiralVisualization(containerId, dataPath) {
     enter.append('text').attr('class', 'spiral-marker-label').attr('text-anchor', 'middle').attr('dy', -15).style('font-size', '12px').style('font-weight', 'bold').style('fill', '#2c3e50').style('pointer-events', 'none');
     const all = enter.merge(markers);
     all.transition().duration(500).style('opacity', 1).attr('transform', d => {
-      const r = milesToRadius(d);
-      const t = radiusToTheta(r);
+        const r = milesToRadius(d);
+        const t = radiusToTheta(r);
       const maxDist = module.currentMode === 'urban' ? 1 : 20;
       const maxR = milesToRadius(maxDist);
       const tMax = radiusToTheta(maxR);
@@ -351,8 +351,8 @@ function createSpiralVisualization(containerId, dataPath) {
       const angle = t + angleOffset;
       const x = module.center.x + r * Math.cos(angle);
       const y = module.center.y + r * Math.sin(angle);
-      return `translate(${x},${y})`;
-    });
+        return `translate(${x},${y})`;
+      });
     all.select('circle').transition().duration(500).attr('r', 10).attr('fill', d => getColorForDistance(d, module.currentMode)).attr('stroke', '#fff').attr('stroke-width', 2);
     all.select('.spiral-marker-label').transition().duration(500).attr('fill', d => getColorForDistance(d, module.currentMode)).text(d => `${d} mi`);
     all.select('circle').style('cursor', 'pointer').on('click', function(event, d) {
@@ -468,21 +468,23 @@ function createDistanceSlider(containerId, dataPath) {
   incomeToggleContainer.append('button').attr('class', 'slider-toggle-btn income-btn').attr('data-filter', 'lowincome').text('Low-Income Only');
 
   const infoDisplay = wrapper.append('div').attr('class', 'slider-info-display');
-  const tractCount = infoDisplay.append('div').attr('class', 'slider-tract-count').text('0');
-  const distanceLabel = infoDisplay.append('div').attr('class', 'slider-distance-label').text('at ½ mile');
+  const tractCount = infoDisplay.append('div').attr('class', 'slider-tract-count').text('0').style('font-size', '64px');
+  const distanceLabel = infoDisplay.append('div').attr('class', 'slider-distance-label').text('at ½ mile').style('font-size', '20px');
 
-  const sliderWidth = 700, sliderHeight = 100, sliderMargin = { top: 20, right: 60, left: 60, bottom: 40 };
-  const sliderSvg = wrapper.append('svg').attr('class', 'slider-svg').attr('viewBox', `0 0 ${sliderWidth} ${sliderHeight}`).attr('preserveAspectRatio', 'xMidYMid meet');
+  // Get container width for responsive sizing - use full available width
+  const containerWidth = container.node().offsetWidth || window.innerWidth - 100;
+  const sliderWidth = containerWidth - 100, sliderHeight = 120, sliderMargin = { top: 25, right: 100, left: 100, bottom: 50 };
+  const sliderSvg = wrapper.append('svg').attr('class', 'slider-svg').attr('viewBox', `0 0 ${sliderWidth} ${sliderHeight}`).attr('preserveAspectRatio', 'xMidYMid meet').style('width', '100%').style('max-width', '100%');
   const sliderG = sliderSvg.append('g').attr('transform', `translate(${sliderMargin.left}, ${sliderMargin.top})`);
   const sliderInnerWidth = sliderWidth - sliderMargin.left - sliderMargin.right;
-  const track = sliderG.append('line').attr('class', 'slider-track').attr('y1', 30).attr('y2', 30);
+  const track = sliderG.append('line').attr('class', 'slider-track').attr('y1', 35).attr('y2', 35);
   const markerGroup = sliderG.append('g').attr('class', 'marker-group');
   const handle = sliderG.append('g').attr('class', 'slider-handle').style('cursor', 'grab');
-  handle.append('circle').attr('r', 14).attr('class', 'slider-handle-circle');
-  handle.append('text').attr('class', 'slider-handle-text').attr('text-anchor', 'middle').attr('dy', 5);
+  handle.append('circle').attr('r', 16).attr('class', 'slider-handle-circle');
+  handle.append('text').attr('class', 'slider-handle-text').attr('text-anchor', 'middle').attr('dy', 5).style('font-size', '14px');
 
-  const barChartWidth = 700, barChartHeight = 250, barMargin = { top: 40, right: 60, left: 80, bottom: 60 };
-  const barSvg = wrapper.append('svg').attr('class', 'bar-chart-svg').attr('viewBox', `0 0 ${barChartWidth} ${barChartHeight}`).attr('preserveAspectRatio', 'xMidYMid meet');
+  const barChartWidth = containerWidth - 100, barChartHeight = 350, barMargin = { top: 50, right: 100, left: 120, bottom: 80 };
+  const barSvg = wrapper.append('svg').attr('class', 'bar-chart-svg').attr('viewBox', `0 0 ${barChartWidth} ${barChartHeight}`).attr('preserveAspectRatio', 'xMidYMid meet').style('width', '100%').style('max-width', '100%');
   const barG = barSvg.append('g').attr('transform', `translate(${barMargin.left}, ${barMargin.top})`);
   const barInnerWidth = barChartWidth - barMargin.left - barMargin.right, barInnerHeight = barChartHeight - barMargin.top - barMargin.bottom;
   const xBarScale = d3.scaleBand().range([0, barInnerWidth]).padding(0.3);
@@ -502,14 +504,14 @@ function createDistanceSlider(containerId, dataPath) {
   }
 
   const drag = d3.drag().on('start', function() { d3.select(this).style('cursor', 'grabbing'); }).on('drag', function(event) {
-    const xScale = getScale();
-    const distances = distancesByFilter[currentGeoFilter];
-    const mouseX = Math.max(0, Math.min(sliderInnerWidth, event.x));
-    const newDistance = xScale.invert(mouseX);
-    let closestDistance = distances[0];
-    let minDiff = Math.abs(distances[0] - newDistance);
-    distances.forEach(d => {
-      const diff = Math.abs(d - newDistance);
+      const xScale = getScale();
+      const distances = distancesByFilter[currentGeoFilter];
+      const mouseX = Math.max(0, Math.min(sliderInnerWidth, event.x));
+      const newDistance = xScale.invert(mouseX);
+      let closestDistance = distances[0];
+      let minDiff = Math.abs(distances[0] - newDistance);
+      distances.forEach(d => {
+        const diff = Math.abs(d - newDistance);
       if (diff < minDiff) { minDiff = diff; closestDistance = d; }
     });
     if (closestDistance !== currentDistance) { currentDistance = closestDistance; updateVisualization(); }
@@ -518,21 +520,21 @@ function createDistanceSlider(containerId, dataPath) {
   handle.call(drag);
 
   geoToggleContainer.selectAll('.slider-toggle-btn').on('click', function() {
-    geoToggleContainer.selectAll('.slider-toggle-btn').classed('active', false);
-    d3.select(this).classed('active', true);
-    const newFilter = d3.select(this).attr('data-filter');
-    if (newFilter !== currentGeoFilter) {
-      currentGeoFilter = newFilter;
-      const newDistances = distancesByFilter[currentGeoFilter];
-      currentDistance = newDistances[0];
-      updateVisualization();
-    }
-  });
+      geoToggleContainer.selectAll('.slider-toggle-btn').classed('active', false);
+      d3.select(this).classed('active', true);
+      const newFilter = d3.select(this).attr('data-filter');
+      if (newFilter !== currentGeoFilter) {
+        currentGeoFilter = newFilter;
+        const newDistances = distancesByFilter[currentGeoFilter];
+        currentDistance = newDistances[0];
+        updateVisualization();
+      }
+    });
 
   incomeToggleContainer.selectAll('.slider-toggle-btn').on('click', function() {
-    incomeToggleContainer.selectAll('.slider-toggle-btn').classed('active', false);
-    d3.select(this).classed('active', true);
-    const newFilter = d3.select(this).attr('data-filter');
+      incomeToggleContainer.selectAll('.slider-toggle-btn').classed('active', false);
+      d3.select(this).classed('active', true);
+      const newFilter = d3.select(this).attr('data-filter');
     if (newFilter !== currentIncomeFilter) { currentIncomeFilter = newFilter; updateVisualization(); }
   });
 
@@ -580,10 +582,10 @@ function createDistanceSlider(containerId, dataPath) {
     markersEnter.append('circle').attr('r', 6).attr('class', 'slider-marker-circle');
     markersEnter.append('text').attr('class', 'slider-marker-text').attr('y', 20).attr('text-anchor', 'middle');
     const markersAll = markersEnter.merge(markers);
-    markersAll.transition().duration(500).attr('transform', d => `translate(${xScale(d)}, 30)`);
-    markersAll.select('text').text(d => d === 0.5 ? '½ mi' : `${d} mi`);
-    markersAll.select('circle').attr('class', d => d === currentDistance ? 'slider-marker-circle active' : 'slider-marker-circle');
-    handle.transition().duration(500).attr('transform', `translate(${xScale(currentDistance)}, 30)`);
+    markersAll.transition().duration(500).attr('transform', d => `translate(${xScale(d)}, 35)`);
+    markersAll.select('text').text(d => d === 0.5 ? '½ mi' : `${d} mi`).style('font-size', '13px');
+    markersAll.select('circle').attr('class', d => d === currentDistance ? 'slider-marker-circle active' : 'slider-marker-circle').attr('r', d => d === currentDistance ? 8 : 6);
+    handle.transition().duration(500).attr('transform', `translate(${xScale(currentDistance)}, 35)`);
     handle.select('.slider-handle-text').text(currentDistance === 0.5 ? '½' : currentDistance);
     const count = allDistanceData[currentIncomeFilter][currentDistance][currentGeoFilter];
     tractCount.text(count.toLocaleString());
