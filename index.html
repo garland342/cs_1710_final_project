@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>US State Map Visualization</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/dual-map.css">
 </head>
 <body>
     <header>
@@ -61,6 +62,72 @@
     </main>
 
     <hr class="section-divider" />
+    <section class="new-section-header">
+      <p>Comparing Food Insecurity with Health Outcomes</p>
+    </section>
+    <hr class="section-divider" />
+
+    <div id="map-header">
+        <p>Click on any state in either map to zoom in and compare county-level data</p>
+    </div>
+    
+    <!-- DUAL MAP CONTAINER -->
+    <div id="dual-map-wrapper">
+        <button id="reset-button">← Back to National View</button>
+        
+        <!-- THREE COLUMN LAYOUT: Left Map | Right Map | Info Panel -->
+        <div id="dual-map-container-with-panel">
+            
+            <!-- LEFT MAP: Food Insecurity (Fixed) -->
+            <div class="map-section">
+                <div class="map-header-section">
+                    <h3>Food Insecurity Across the Nation</h3>
+                </div>
+                <div class="map-content">
+                    <div id="map-left"></div>
+                    <div id="legend-left"></div>
+                </div>
+            </div>
+
+            <!-- RIGHT MAP: Selectable Metrics -->
+            <div class="map-section">
+                <div class="map-header-section">
+                    <h3>Health Metric Comparison</h3>
+                    <div class="metric-selector">
+                        <label for="comparison-metric-select">Compare with:</label>
+                        <select id="comparison-metric-select">
+                            <option value="DIABETES_CrudePrev" selected>Diabetes</option>
+                            <option value="DEPRESSION_CrudePrev">Depression</option>
+                            <option value="BPHIGH_CrudePrev">High Blood Pressure</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="map-content">
+                    <div id="map-right"></div>
+                    <div id="legend-right"></div>
+                </div>
+            </div>
+
+            <!-- INFO PANEL (Side-by-side with maps) -->
+            <div id="info-panel" class="hidden">
+                <div class="panel-header">
+                    <h2 id="state-name-header">Select State</h2>
+                    <div class="subtitle" id="county-count-subtitle">Click a state to view data</div>
+                </div>
+                <div class="panel-content" id="info-content">
+                    <div class="instruction">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                        </svg>
+                        <p>Click on a state to view detailed statistics and county-level data</p>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <hr class="section-divider" />
 
     <section class="new-section-header">
       <p>The Other Side of Scarcity: Tracking Depression Across America</p>
@@ -79,34 +146,6 @@
     
     <hr class="section-divider" />
     <section class="new-section-header">
-      <p>In the South and Midwest, Scarcity Meets Strain</p>
-    </section>
-    <hr class="section-divider" />
-
-    <div id="map-header">
-        <p>Click on any state to zoom in and explore county-level data</p>
-    </div>
-    
-    <div id="container">
-        <div id="map-container">
-            <button id="reset-button">← Back to US Map</button>
-            <div id="map"></div>
-            <div id="legend"></div>
-        </div>
-        
-        <div id="info-panel" class="hidden">
-            <div class="instruction">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                </svg>
-                <p>Click on a state to view detailed statistics and county-level data</p>
-            </div>
-        </div>
-    </div>
-    
-    
-    <hr class="section-divider" />
-    <section class="new-section-header">
       <p>Communities Leading the Way</p>
     </section>
     <hr class="section-divider" />
@@ -116,11 +155,6 @@
     </section>
 
     <div id="voronoi-container"></div>
-
-
-    
-    
-    
 
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://d3js.org/topojson.v3.min.js"></script>

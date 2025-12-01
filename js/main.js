@@ -630,7 +630,7 @@ function createSpiralVisualization(containerId, dataPath) {
     .style('color', '#666')
     .style('font-size', '0.95rem')
     .style('margin-bottom', '2rem')
-    .style('margin-top', '0')
+    .style('margin-top', '2rem')
     .style('font-style', 'italic')
     .text('Click on each distance to uncover food quality in rural and urban food deserts');
 
