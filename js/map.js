@@ -279,9 +279,9 @@ function drawCountiesOnMap(countyGroup, stateName, metric, colorScheme) {
         .attr("class", "county")
         .attr("d", path)
         .attr("fill", d => {
-            // If state has no valid data for this metric, always return gray
+            // If state has no valid data for this metric, always return darker gray
             if (!hasValidData) {
-                return "#e0e0e0";
+                return "#999999";
             }
             
             const countyTopoName = d.properties && d.properties.name ? 
@@ -298,9 +298,9 @@ function drawCountiesOnMap(countyGroup, stateName, metric, colorScheme) {
 
             if (matchingData) {
                 const value = +matchingData[metric];
-                return isNaN(value) ? "#e0e0e0" : colorScale(value);
+                return isNaN(value) ? "#999999" : colorScale(value);
             }
-            return "#e0e0e0";
+            return "#999999";
         })
         .attr("stroke", "#fff")
         .attr("stroke-width", 0.5)
@@ -351,10 +351,14 @@ function getCountyTooltip(countyFeature, metric) {
         const value = +matchingData[metric];
         const metricLabel = metric === BASELINE_METRIC ? "Food Insecurity Rate (Unadjusted %)" : 
             getComparisonMetricInfo(metric).label;
+        
+        if (isNaN(value)) {
+            return `${matchingData[COUNTY_COLUMN]}\n${metricLabel}: No data available`;
+        }
         return `${matchingData[COUNTY_COLUMN]}\n${metricLabel}: ${formatValue(value, ".2f")}`;
     }
 
-    return `County: ${countyFeature.id}\nData not available`;
+    return `County: ${countyFeature.id}\nNo data available`;
 }
 
 // ============================================
@@ -595,7 +599,7 @@ function updateRightMapStates() {
         .attr("fill", d => {
             const stateName = fipsToName.get(d.id);
             const avg = stateAverages.get(stateName);
-            return avg ? colorScale(avg) : "#e0e0e0";
+            return avg ? colorScale(avg) : "#999999";
         });
 
     stateGroupRight.selectAll("path.state")
@@ -604,9 +608,9 @@ function updateRightMapStates() {
             const stateName = fipsToName.get(d.id);
             const avg = stateAverages.get(stateName);
             const metricLabel = getComparisonMetricInfo(currentComparisonMetric).label;
-            return stateName && avg 
-                ? `${stateName}\n${metricLabel}: ${avg.toFixed(2)}%\nClick to zoom in` 
-                : stateName || "No data";
+            if (!stateName) return "No data available";
+            if (!avg || isNaN(avg)) return `${stateName}\n${metricLabel}: No data available`;
+            return `${stateName}\n${metricLabel}: ${avg.toFixed(2)}%\nClick to zoom in`;
         });
 }
 
@@ -717,7 +721,7 @@ function drawStatesOnBothMaps() {
         .attr("fill", d => {
             const stateName = fipsToName.get(d.id);
             const avg = leftStateAvg.get(stateName);
-            return avg ? leftColorScale(avg) : "#e0e0e0";
+            return (avg && !isNaN(avg)) ? leftColorScale(avg) : "#999999";
         })
         .attr("stroke", "#fff")
         .attr("stroke-width", 1)
@@ -739,9 +743,9 @@ function drawStatesOnBothMaps() {
         .text(d => {
             const stateName = fipsToName.get(d.id);
             const avg = leftStateAvg.get(stateName);
-            return stateName && avg 
-                ? `${stateName}\nFood Insecurity: ${avg.toFixed(2)}%\nClick to zoom in` 
-                : stateName || "No data";
+            if (!stateName) return "No data available";
+            if (!avg || isNaN(avg)) return `${stateName}\nFood Insecurity: No data available`;
+            return `${stateName}\nFood Insecurity: ${avg.toFixed(2)}%\nClick to zoom in`;
         });
 
     // Draw right map states
@@ -753,7 +757,7 @@ function drawStatesOnBothMaps() {
         .attr("fill", d => {
             const stateName = fipsToName.get(d.id);
             const avg = rightStateAvg.get(stateName);
-            return avg ? rightColorScale(avg) : "#e0e0e0";
+            return (avg && !isNaN(avg)) ? rightColorScale(avg) : "#999999";
         })
         .attr("stroke", "#fff")
         .attr("stroke-width", 1)
@@ -776,9 +780,9 @@ function drawStatesOnBothMaps() {
             const stateName = fipsToName.get(d.id);
             const avg = rightStateAvg.get(stateName);
             const metricLabel = getComparisonMetricInfo(currentComparisonMetric).label;
-            return stateName && avg 
-                ? `${stateName}\n${metricLabel}: ${avg.toFixed(2)}%\nClick to zoom in` 
-                : stateName || "No data";
+            if (!stateName) return "No data available";
+            if (!avg || isNaN(avg)) return `${stateName}\n${metricLabel}: No data available`;
+            return `${stateName}\n${metricLabel}: ${avg.toFixed(2)}%\nClick to zoom in`;
         });
     
     // Create legends
