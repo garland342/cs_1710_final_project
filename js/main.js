@@ -1,3 +1,11 @@
+// ============================================
+// INTERACTIVE CAROUSEL & AUXILIARY VISUALIZATIONS
+// - Community organizations grid (Voronoi-style circles)
+// - Food access spiral visualization
+// - Distance slider visualization
+// - Carousel navigation logic
+// ============================================
+
 document.addEventListener("DOMContentLoaded", () => {
   if (typeof d3 !== 'undefined') {
     console.log("Page ready. D3 version:", d3.version);
