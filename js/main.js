@@ -412,8 +412,10 @@ function createSpiralVisualization(containerId, dataPath) {
     d3.select('#spiral-food-popup').remove();
     const foods = foodImages[mode][distance] || [];
     const hasNoFood = foods === null || (foods.length === 1 && foods[0].includes('nothing.jpg'));
-    // Append to body for fixed positioning to work properly
-    const popup = d3.select('body').append('div').attr('id', 'spiral-food-popup').attr('class', 'spiral-food-popup');
+    // Append to the spiral wrapper container for proper positioning
+    const wrapperContainer = document.querySelector('.spiral-wrapper-container');
+    const targetContainer = wrapperContainer || slide3;
+    const popup = d3.select(targetContainer).append('div').attr('id', 'spiral-food-popup').attr('class', 'spiral-food-popup');
     const header = popup.append('div').attr('class', 'panel-header').style('background', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)').style('color', 'white').style('padding', '8px 5px').style('text-align', 'center');
     header.append('h2').style('font-size', '15px').style('margin-bottom', '2px').style('font-weight', 'bold').text(`Food options within a ${distance} mile${distance !== 1 ? 's' : ''} radius`);
     const content = popup.append('div').attr('class', 'panel-content').style('padding', '8px 8px');
