@@ -229,7 +229,7 @@ function createSpiralVisualization(containerId, dataPath) {
     .style('font-size', '1.5rem')
     .style('font-weight', 'bold')
     .style('color', '#2c3e50')
-    .style('margin-bottom', '2.5rem')
+    .style('margin-bottom', '1.5rem')
     .style('margin-top', '0')
     .style('min-height', '2rem')
     .text('Maxwell Park, California');
@@ -240,7 +240,7 @@ function createSpiralVisualization(containerId, dataPath) {
     .style('flex-direction', 'row')
     .style('gap', '1rem')
     .style('justify-content', 'center')
-    .style('margin-bottom', '2rem');
+    .style('margin-bottom', '0.75rem');
 
   const ruralBtn = toggleContainer.append('button')
     .attr('class', 'spiral-toggle-btn')
@@ -462,15 +462,45 @@ function createSpiralVisualization(containerId, dataPath) {
       const noFoodContainer = content.append('div').style('text-align', 'center').style('padding', '1rem 0').style('display', 'flex').style('flex-direction', 'column').style('align-items', 'center').style('gap', '1rem');
       // Show the nothing.jpg image if it exists in the foods array
       if (foods && foods.length > 0 && foods[0].includes('nothing.jpg')) {
-        const imgContainer = noFoodContainer.append('div').style('width', '100%').style('max-width', '100%').style('display', 'flex').style('justify-content', 'center');
-        imgContainer.append('img').attr('src', foods[0]).attr('alt', 'No food options').style('width', '100%').style('max-width', '100%').style('max-height', '200px').style('height', 'auto').style('object-fit', 'contain').style('display', 'block');
+        const imgContainer = noFoodContainer.append('div')
+          .style('width', '100%')
+          .style('max-width', '100%')
+          .style('display', 'flex')
+          .style('justify-content', 'center');
+        imgContainer.append('img')
+          .attr('src', foods[0])
+          .attr('alt', 'No food options')
+          .style('width', '100%')
+          .style('max-width', '100%')
+          .style('max-height', '220px')
+          .style('height', 'auto')
+          .style('object-fit', 'contain')
+          .style('display', 'block');
       }
       noFoodContainer.append('div').style('font-size', '1.2rem').style('font-weight', 'bold').style('color', '#2c3e50').text('No convenience stores or fast food options');
     } else {
       const imageGrid = content.append('div').style('display', 'flex').style('flex-direction', 'column').style('gap', '0.75rem').style('max-width', '100%').style('align-items', 'center');
       foods.forEach((imagePath) => {
-        const imgContainer = imageGrid.append('div').style('border-radius', '8px').style('overflow', 'visible').style('box-shadow', '0 2px 8px rgba(0,0,0,0.1)').style('background', 'white').style('display', 'flex').style('flex-direction', 'column').style('align-items', 'center').style('width', '100%').style('max-width', '100%');
-        imgContainer.append('img').attr('src', imagePath).attr('alt', 'Food option').style('width', '100%').style('max-width', '100%').style('max-height', '200px').style('height', 'auto').style('object-fit', 'contain').style('display', 'block').style('padding', '4px');
+        const imgContainer = imageGrid.append('div')
+          .style('border-radius', '8px')
+          .style('overflow', 'visible')
+          .style('box-shadow', '0 2px 8px rgba(0,0,0,0.1)')
+          .style('background', 'white')
+          .style('display', 'flex')
+          .style('flex-direction', 'column')
+          .style('align-items', 'center')
+          .style('width', '100%')
+          .style('max-width', '100%');
+        imgContainer.append('img')
+          .attr('src', imagePath)
+          .attr('alt', 'Food option')
+          .style('width', '100%')
+          .style('max-width', '100%')
+          .style('max-height', '170px')
+          .style('height', 'auto')
+          .style('object-fit', 'contain')
+          .style('display', 'block')
+          .style('padding', '4px');
       });
     }
     // Show reset button
@@ -488,12 +518,12 @@ function createSpiralVisualization(containerId, dataPath) {
     const containerRect = container.node().getBoundingClientRect();
     const containerWidth = containerRect.width || vizWrap.node().clientWidth || 800;
     const containerHeight = containerRect.height || vizWrap.node().clientHeight || 800;
-    // Use the full available size
+    // Use the full available size, but keep the spiral modest in radius
     module.viewW = Math.max(containerWidth, 600);
-    module.viewH = Math.max(containerHeight, module.viewW * 0.9);
+    module.viewH = Math.max(containerHeight, module.viewW * 0.8);
     svg.attr('viewBox', `0 0 ${module.viewW} ${module.viewH}`);
     module.center = { x: module.viewW / 2, y: module.viewH / 2 };
-    module.maxVisualRadius = Math.min(module.viewW, module.viewH) * 0.4;
+    module.maxVisualRadius = Math.min(module.viewW, module.viewH) * 0.29;
     const line = d3.line();
     svg.select('.spiral-path').transition().duration(500).attr('d', line(buildSpiralPoints()));
     placeMarkers();
@@ -599,6 +629,7 @@ function createDistanceSlider(containerId, dataPath) {
   if (container.empty()) { console.error(`Container ${containerId} not found`); return null; }
 
   const wrapper = container.append('div').attr('class', 'slider-wrapper');
+  // Single-column layout: toggles and info centered above slider and bar chart
   const geoToggleContainer = wrapper.append('div').attr('class', 'slider-toggle-container primary-toggle');
   geoToggleContainer.append('button').attr('class', 'slider-toggle-btn active').attr('data-filter', 'both').text('Both');
   geoToggleContainer.append('button').attr('class', 'slider-toggle-btn').attr('data-filter', 'urban').text('Urban');

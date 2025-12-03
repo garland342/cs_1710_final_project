@@ -539,6 +539,17 @@ h1 {
   text-align: center;
 }
 
+/* Slide 2 standalone heading (no container wrapper) */
+.slide-2-heading {
+  text-align: center;
+  padding: 10px 40px;
+  max-width: 1200px;
+  margin: 0 auto 10px auto;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
 /* Style for "From city block to country roads..." section */
 .subtitle-section {
   text-align: center;
@@ -966,7 +977,7 @@ p, li {
   max-width: 100%;
   width: 100%;
   margin: 0 auto;
-  padding: 2rem 2rem;
+  padding: 0.75rem 2rem 1.25rem 2rem;
   background: transparent;
   border-radius: 0;
   box-shadow: none;
@@ -1029,11 +1040,11 @@ p, li {
 /* Main Info Display */
 .slider-info-display {
   text-align: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .slider-tract-count {
-  font-size: 72px;
+  font-size: 54px;
   font-weight: 700;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   -webkit-background-clip: text;
@@ -1044,7 +1055,7 @@ p, li {
 }
 
 .slider-distance-label {
-  font-size: 22px;
+  font-size: 18px;
   color: #2c3e50;
   font-weight: 500;
   margin-top: 5px;
@@ -1055,9 +1066,9 @@ p, li {
   width: 100%;
   max-width: 100%;
   height: auto;
-  min-height: 120px;
+  min-height: 100px;
   display: block;
-  margin: 2rem auto;
+  margin: 1.25rem auto;
 }
 
 .slider-track {
@@ -1114,9 +1125,9 @@ p, li {
   width: 100%;
   max-width: 100%;
   height: auto;
-  min-height: 350px;
+  min-height: 260px;
   display: block;
-  margin: 2rem auto;
+  margin: 1.5rem auto 1.25rem auto;
 }
 
 /* Bar chart bars - default for regular charts */
@@ -1245,7 +1256,7 @@ p, li {
     width: 100%;
     height: 100%;
     max-height: 100%;
-    overflow-y: auto;
+    /* overflow-y: auto; */
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
@@ -1301,7 +1312,7 @@ p, li {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     overflow-y: auto;
     height: 100%;
     max-height: 100%;
@@ -1344,12 +1355,11 @@ p, li {
 
 /* Slide 3: Food Access Spiral */
 .slide-3 {
-    padding: 20px 20px;
+    padding: 10px 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    overflow-y: auto;
     height: 100%;
     max-height: 100%;
     box-sizing: border-box;
@@ -1357,7 +1367,7 @@ p, li {
 }
 
 .slide-3 .new-section-header {
-    margin: 0 0 25px 0;
+    margin: 0 0 12px 0;
     padding: 0;
     flex-shrink: 0;
     text-align: center;
@@ -1367,7 +1377,7 @@ p, li {
 }
 
 .slide-3 .spiral-instruction-text {
-    margin: 0 0 25px 0;
+    margin: 0 0 10px 0;
     padding: 0 20px;
     flex-shrink: 0;
     text-align: center;
@@ -1388,6 +1398,8 @@ p, li {
     flex-direction: row;
     justify-content: center;
     align-items: flex-start;
+    /* Constrain slide 3 content to viewport above carousel controls without internal scrolling */
+    max-height: calc(100vh - 220px);
     overflow: visible;
     margin-top: 0;
 }
@@ -1428,12 +1440,12 @@ p, li {
 .slide-3 #spiral-container .spiral-location-display {
     flex-shrink: 0;
     margin-top: 0;
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .slide-3 #spiral-container .spiral-toggle-container {
     flex-shrink: 0;
-    margin-bottom: 1rem;
+    margin-bottom: 0.25rem;
     z-index: 100;
     position: relative;
 }
@@ -1451,7 +1463,7 @@ p, li {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 1rem;
+    margin-top: 0;
 }
 
 .slide-3 #spiral-container .spiral-viz {
@@ -1490,8 +1502,10 @@ p, li {
 #spiral-food-popup {
     position: absolute;
     right: 30px;
-    top: 50%;
-    max-height: 70vh;
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    max-height: 100%;
     max-width: 38%;
     width: 38%;
     overflow-y: auto;
@@ -1499,7 +1513,7 @@ p, li {
     z-index: 10000;
     box-sizing: border-box;
     transition: transform 750ms ease-in-out, opacity 750ms ease-in-out;
-    transform: translateX(calc(100% + 40px)) translateY(-50%);
+    transform: translateX(calc(100% + 40px));
     opacity: 0;
     pointer-events: none;
     background: white;
@@ -1508,7 +1522,7 @@ p, li {
 }
 
 #spiral-food-popup.visible {
-    transform: translateX(0) translateY(-50%);
+    transform: translateX(0);
     opacity: 1;
     pointer-events: auto;
 }
@@ -1577,7 +1591,7 @@ p, li {
 
 /* Slide 4: Distance Slider */
 .slide-4 {
-    padding: 20px 10px;
+    padding: 14px 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1587,17 +1601,17 @@ p, li {
 }
 
 .slide-4 .geography-section {
-    margin: 0 0 20px 0;
-    padding: 20px 20px;
+    margin: 0 0 10px 0;
+    padding: 12px 20px;
     flex-shrink: 0;
     width: 100%;
 }
 
 .slide-4 .slider-instruction-section {
     text-align: center;
-    padding: 0 40px 20px 40px;
-    max-width: 1000px;
-    margin: 0 auto 20px auto;
+  padding: 0 24px 10px 24px;
+  max-width: 1200px;
+    margin: 0 auto 10px auto;
     flex-shrink: 0;
 }
 
@@ -1622,7 +1636,9 @@ p, li {
     padding: 0;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    /* Allow this slide to scroll vertically so content isn't cut off */
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .slide-5 #map-header {
@@ -1645,8 +1661,8 @@ p, li {
 
 .slide-5 #dual-map-wrapper {
     flex: 1;
-    overflow-y: auto;
-    padding: 20px;
+    /* Keep entire map + panel view within the slide without internal scrolling */
+    padding: 16px;
 }
 
 /* Slide 5: Food Insecurity Charts */
@@ -1685,7 +1701,6 @@ p, li {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    overflow-y: auto;
     height: 100%;
     max-height: 100%;
     box-sizing: border-box;
@@ -1732,8 +1747,8 @@ p, li {
 }
 
 .slide-7 .team-photo {
-    width: 280px;
-    height: 280px;
+    width: 220px;
+    height: 220px;
     border-radius: 50%;
     object-fit: cover;
     margin-bottom: 20px;
@@ -1769,18 +1784,18 @@ p, li {
     background: white;
     border: 1px solid #000;
     border-radius: 0;
-    padding: 40px 50px;
+    padding: 24px 40px;
     box-sizing: border-box;
     flex-shrink: 0;
-    margin-top: 20px;
-    margin-bottom: 0;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .slide-7 .mission-statement h3 {
     font-size: 1.5rem;
     font-weight: 700;
     color: #000;
-    margin: 0 0 20px 0;
+    margin: 0 0 12px 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
@@ -1803,11 +1818,11 @@ p, li {
     justify-content: center;
     gap: 30px;
     z-index: 1000;
-    background: rgba(255, 255, 255, 0.95);
-    padding: 20px 30px;
+    background: transparent;
+    padding: 6px 24px;
     margin: 0;
-    border-top: 1px solid #e0e0e0;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    border-top: none;
+    box-shadow: none;
     flex-shrink: 0;
 }
 
@@ -2006,8 +2021,8 @@ p, li {
 
 #dual-map-wrapper {
     max-width: 1900px;
-    margin: 30px auto;
-    padding: 0 20px;
+    margin: 4px auto 0 auto;
+    padding: 0 12px;
     position: relative;
 }
 
@@ -2023,7 +2038,7 @@ p, li {
     background: white;
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    padding: 20px;
+    padding: 14px;
     min-width: 0;
     display: flex;
     flex-direction: column; /* Stack header and content vertically */
@@ -2083,8 +2098,10 @@ p, li {
 #map-right {
     position: relative;
     width: 100%;
-    flex: 1; /* Map takes up available space */
-    min-height: 500px;
+    flex: 1; /* Map takes up remaining vertical space inside the card */
+    /* Allow room at the bottom of the card for the legend */
+    height: auto;
+    min-height: 0;
 }
 
 #map-left svg,
@@ -2190,7 +2207,6 @@ p, li {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    height: 100%;
 }
 
 /* Show info panel by default, just change content */
