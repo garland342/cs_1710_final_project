@@ -11,9 +11,9 @@ const BASELINE_METRIC = "FOODINSECU_CrudePrev";
 
 // Available comparison metrics for right map
 const COMPARISON_METRICS = [
-    { value: "DIABETES_CrudePrev", label: "Rate of Diabetes (Unadjusted %)", format: ".2f", colorScheme: d3.interpolateGreens },
-    { value: "DEPRESSION_CrudePrev", label: "Rate of Depression (Unadjusted %)", format: ".2f", colorScheme: d3.interpolatePurples},
-    { value: "BPHIGH_CrudePrev", label: "High Blood Pressure Rate (Unadjusted %)", format: ".2f", colorScheme: d3.interpolateReds}
+    { value: "DIABETES_CrudePrev", label: "Frequency of Diabetes (Unadjusted %)", format: ".2f", colorScheme: d3.interpolateGreens },
+    { value: "DEPRESSION_CrudePrev", label: "Frequency of Depression (Unadjusted %)", format: ".2f", colorScheme: d3.interpolatePurples},
+    { value: "BPHIGH_CrudePrev", label: "High Blood Pressure Frequency (Unadjusted %)", format: ".2f", colorScheme: d3.interpolateReds}
 ];
 
 // ============================================
@@ -132,7 +132,7 @@ function getComparisonMetricInfo(metricValue) {
 }
 
 function getMetricLabel(metric) {
-    if (metric === BASELINE_METRIC) return "Food Insecurity Rate (Unadjusted %)";
+    if (metric === BASELINE_METRIC) return "Food Insecurity Frequency (Unadjusted %)";
     const info = getComparisonMetricInfo(metric);
     return `${info.label}`;
 }
@@ -349,7 +349,7 @@ function getCountyTooltip(countyFeature, metric) {
 
     if (matchingData) {
         const value = +matchingData[metric];
-        const metricLabel = metric === BASELINE_METRIC ? "Food Insecurity Rate (Unadjusted %)" : 
+        const metricLabel = metric === BASELINE_METRIC ? "Food Insecurity Frequency (Unadjusted %)" : 
             getComparisonMetricInfo(metric).label;
         
         if (isNaN(value)) {
@@ -425,7 +425,7 @@ function showComparisonInfo(stateName) {
     // Food Insecurity Card
     const foodCard = comparisonSection.append("div")
         .attr("class", "comparison-card food-insecurity");
-    foodCard.append("h4").text("Food Insecurity Rate (Unadjusted %)");
+    foodCard.append("h4").text("Food Insecurity Frequency (Unadjusted %)");
     addStatRows(foodCard, BASELINE_METRIC);
 
     // Comparison Metric Card
@@ -433,7 +433,8 @@ function showComparisonInfo(stateName) {
     const compCard = comparisonSection.append("div")
         .attr("class", "comparison-card comparison-metric")
         .style("border-left-color", getMetricColor(currentComparisonMetric));
-    compCard.append("h4").text(compMetric.label);
+    
+    compCard.append("h4").text(`${compMetric.label}`);
     addStatRows(compCard, currentComparisonMetric);
 
     // Distribution Charts
@@ -457,10 +458,10 @@ function addStatRows(container, metric) {
         .filter(v => !isNaN(v));
 
     const stats = [
-        { label: "Average", value: d3.mean(values) },
-        { label: "Minimum", value: d3.min(values) },
-        { label: "Maximum", value: d3.max(values) },
-        { label: "Median", value: d3.median(values) }
+        { label: "Mean Percentage Afflicted Per County", value: d3.mean(values) },
+        { label: "Minimum County Affliction Rate (%)", value: d3.min(values) },
+        { label: "Maximum County Affliction Rate (%)", value: d3.max(values) },
+        { label: "Median County Affliction Rate (%)", value: d3.median(values) }
     ];
 
     stats.forEach(stat => {
@@ -641,7 +642,7 @@ function updateLegends() {
             const leftColorScale = d3.scaleSequential()
                 .domain(d3.extent(leftValues))
                 .interpolator(d3.interpolateBlues);
-            createLegend("#legend-left", leftColorScale, leftValues, "Food Insecurity Rate (Unadjusted %)");
+            createLegend("#legend-left", leftColorScale, leftValues, "Food Insecurity Frequency (Unadjusted %)");
         }
         
         if (!hasRightData) {
@@ -677,7 +678,7 @@ function updateLegends() {
             .domain(d3.extent(rightValues))
             .interpolator(getComparisonMetricInfo(currentComparisonMetric).colorScheme);
         
-        createLegend("#legend-left", leftColorScale, leftValues, "Food Insecurity Rate (Unadjusted %)");
+        createLegend("#legend-left", leftColorScale, leftValues, "Food Insecurity Frequency (Unadjusted %)");
         createLegend("#legend-right", rightColorScale, rightValues, 
             getComparisonMetricInfo(currentComparisonMetric).label);
     }
@@ -958,7 +959,7 @@ function createBarChart(containerId, data, metric, title, colorScheme) {
         .attr('text-anchor', 'middle')
         .style('font-size', '8px')
         .style('fill', '#666')
-        .text('Rate (%)');
+        .text('Frequency (%)');
 }
 
 function showBarCharts() {
@@ -987,19 +988,19 @@ function showBarCharts() {
     
     if (barChartsData.currentMetric === 'DEPRESSION_CrudePrev') {
         secondMetric = 'depression';
-        secondLabel = 'Depression Rate';
+        secondLabel = 'Depression Frequency';
         secondColorScheme = d3.interpolatePurples;
     } else if (barChartsData.currentMetric === 'DIABETES_CrudePrev') {
         secondMetric = 'diabetes';
-        secondLabel = 'Diabetes Rate';
+        secondLabel = 'Diabetes Frequency';
         secondColorScheme = d3.interpolateGreens;
     } else if (barChartsData.currentMetric === 'BPHIGH_CrudePrev') {
         secondMetric = 'bphigh';
-        secondLabel = 'High Blood Pressure Rate';
+        secondLabel = 'High Blood Pressure Frequency';
         secondColorScheme = d3.interpolateReds;
     }
 
-    createBarChart('#bar-chart-1', foodInsecurityData, 'foodInsecurity', 'Food Insecurity Rate', d3.interpolateBlues);
+    createBarChart('#bar-chart-1', foodInsecurityData, 'foodInsecurity', 'Food Insecurity Frequency', d3.interpolateBlues);
     createBarChart('#bar-chart-2', healthMetricData, secondMetric, secondLabel, secondColorScheme);
 }
 
