@@ -189,6 +189,31 @@ function createSpiralVisualization(containerId, dataPath) {
     return null;
   }
 
+  // Get the wrapper container (parent of spiral-container)
+  const wrapperContainer = d3.select('.spiral-wrapper-container');
+  
+  // Create map container for location maps
+  const mapContainer = wrapperContainer.append('div')
+    .attr('class', 'spiral-map-container')
+    .style('position', 'absolute')
+    .style('right', '20px')
+    .style('top', '20px')
+    .style('width', '25%')
+    .style('max-width', '25%')
+    .style('max-height', '25vh')
+    .style('min-width', '200px')
+    .style('display', 'none')
+    .style('z-index', '100')
+    .style('transition', 'opacity 0.3s ease-in-out');
+  
+  const mapImage = mapContainer.append('img')
+    .attr('class', 'spiral-location-map')
+    .style('width', '100%')
+    .style('height', 'auto')
+    .style('object-fit', 'contain')
+    .style('border-radius', '12px')
+    .style('box-shadow', '0 4px 6px rgba(0,0,0,0.1)');
+
   // Location display is now inside the container
   const locationDisplay = container.append('div')
     .attr('class', 'spiral-location-display')
@@ -243,7 +268,6 @@ function createSpiralVisualization(containerId, dataPath) {
     .style('pointer-events', 'auto')
     .text('Urban Food Desert: Maxwell Park');
 
-  
   const vizWrap = container.append('div')
     .attr('class', 'spiral-viz-wrap')
     .style('display', 'flex')
@@ -270,6 +294,10 @@ function createSpiralVisualization(containerId, dataPath) {
     .style('stroke-width', '2px');
   
   const markerGroup = svg.append('g').attr('class', 'spiral-markers');
+
+  // Store map container and image in module for access
+  module.mapContainer = mapContainer;
+  module.mapImage = mapImage;
 
   const foodImages = {
     urban: {
@@ -364,6 +392,7 @@ function createSpiralVisualization(containerId, dataPath) {
         d3.selectAll('.spiral-marker-g circle').transition().duration(200).attr('r', 16).attr('stroke-width', 2);
         d3.select(this).transition().duration(200).attr('r', 22).attr('stroke-width', 3);
         shiftSpiralLeft();
+        hideLocationMap(); // Hide map when circle is clicked
         showFoodSidebar(event, d, module.currentMode);
       }
     }).on('mouseenter', function() {
@@ -392,6 +421,8 @@ function createSpiralVisualization(containerId, dataPath) {
     d3.selectAll('.spiral-marker-g circle').transition().duration(200).attr('r', 16).attr('stroke-width', 2);
     // Hide reset button
     d3.select('#spiral-reset-button').classed('visible', false);
+    // Show map again when popup is closed
+    showLocationMap();
   }
 
   function closeFoodSidebar() {
@@ -460,6 +491,27 @@ function createSpiralVisualization(containerId, dataPath) {
     placeMarkers();
   }
 
+  function showLocationMap() {
+    // Only show map if no popup is open
+    if (module.selectedDistance === null) {
+      const mapPath = module.currentMode === 'urban' 
+        ? 'images/maxwell park map.jpg' 
+        : 'images/baldwin florida map.jpg';
+      module.mapImage.attr('src', mapPath);
+      module.mapContainer.style('display', 'block').style('opacity', '0');
+      setTimeout(() => {
+        module.mapContainer.style('opacity', '1');
+      }, 10);
+    }
+  }
+
+  function hideLocationMap() {
+    module.mapContainer.style('opacity', '0');
+    setTimeout(() => {
+      module.mapContainer.style('display', 'none');
+    }, 300);
+  }
+
   function switchMode(mode) {
     module.currentMode = mode;
     module.currentDistances = mode === 'urban' ? module.urbanDistances : module.ruralDistances;
@@ -479,6 +531,7 @@ function createSpiralVisualization(containerId, dataPath) {
     module.selectedDistance = null;
     resetSpiralPopup();
     render();
+    showLocationMap();
   }
 
   urbanBtn.on('click', function(event) {
@@ -495,13 +548,21 @@ function createSpiralVisualization(containerId, dataPath) {
   d3.csv(dataPath).then(rows => {
     module.lastRows = rows;
     render();
+    // Show initial map for urban mode
+    showLocationMap();
   }).catch(err => {
     console.warn('CSV load error', err);
     render();
+    // Show initial map for urban mode
+    showLocationMap();
   });
   const resizeHandler = () => render();
   window.addEventListener('resize', resizeHandler);
-  setTimeout(() => render(), 60);
+  setTimeout(() => {
+    render();
+    // Show initial map for urban mode
+    showLocationMap();
+  }, 60);
   
   // Set up reset button event listener
   const resetBtn = document.getElementById('spiral-reset-button');
