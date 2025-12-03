@@ -11,8 +11,8 @@ const BASELINE_METRIC = "FOODINSECU_CrudePrev";
 
 // Available comparison metrics for right map
 const COMPARISON_METRICS = [
-    { value: "DIABETES_CrudePrev", label: "Rate of Diabetes (Unadjusted %)", format: ".2f", colorScheme: d3.interpolateReds },
-    { value: "DEPRESSION_CrudePrev", label: "Rate of Depression (Unadjusted %)", format: ".2f", colorScheme: d3.interpolateReds},
+    { value: "DIABETES_CrudePrev", label: "Rate of Diabetes (Unadjusted %)", format: ".2f", colorScheme: d3.interpolateGreens },
+    { value: "DEPRESSION_CrudePrev", label: "Rate of Depression (Unadjusted %)", format: ".2f", colorScheme: d3.interpolatePurples},
     { value: "BPHIGH_CrudePrev", label: "High Blood Pressure Rate (Unadjusted %)", format: ".2f", colorScheme: d3.interpolateReds}
 ];
 
@@ -984,11 +984,11 @@ function showBarCharts() {
     if (barChartsData.currentMetric === 'DEPRESSION_CrudePrev') {
         secondMetric = 'depression';
         secondLabel = 'Depression Rate';
-        secondColorScheme = d3.interpolateReds;
+        secondColorScheme = d3.interpolatePurples;
     } else if (barChartsData.currentMetric === 'DIABETES_CrudePrev') {
         secondMetric = 'diabetes';
         secondLabel = 'Diabetes Rate';
-        secondColorScheme = d3.interpolateReds;
+        secondColorScheme = d3.interpolateGreens;
     } else if (barChartsData.currentMetric === 'BPHIGH_CrudePrev') {
         secondMetric = 'bphigh';
         secondLabel = 'High Blood Pressure Rate';
