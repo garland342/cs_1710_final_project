@@ -176,9 +176,9 @@ function createSpiralVisualization(containerId, dataPath) {
     a: 8,
     b: 6,
     center: { x: 0, y: 0 },
-    viewW: 600,
-    viewH: 520,
-    maxVisualRadius: 200,
+    viewW: 800,
+    viewH: 800,
+    maxVisualRadius: 250,
     lastRows: [],
     selectedDistance: null
   };
@@ -189,15 +189,17 @@ function createSpiralVisualization(containerId, dataPath) {
     return null;
   }
 
-  const instructText = container.append('p')
-    .attr('class', 'spiral-instruction-text')
+  // Location display is now inside the container
+  const locationDisplay = container.append('div')
+    .attr('class', 'spiral-location-display')
     .style('text-align', 'center')
-    .style('color', '#666')
-    .style('font-size', '0.95rem')
-    .style('margin-bottom', '2rem')
-    .style('margin-top', '2rem')
-    .style('font-style', 'italic')
-    .text('Click on each distance to uncover food quality in rural and urban food deserts');
+    .style('font-size', '1.5rem')
+    .style('font-weight', 'bold')
+    .style('color', '#2c3e50')
+    .style('margin-bottom', '2.5rem')
+    .style('margin-top', '0')
+    .style('min-height', '2rem')
+    .text('Maxwell Park, California');
 
   const toggleContainer = container.append('div')
     .attr('class', 'spiral-toggle-container')
@@ -209,6 +211,7 @@ function createSpiralVisualization(containerId, dataPath) {
 
   const ruralBtn = toggleContainer.append('button')
     .attr('class', 'spiral-toggle-btn')
+    .attr('type', 'button')
     .style('padding', '0.5rem 1rem')
     .style('border', '2px solid #667eea')
     .style('background', 'white')
@@ -220,10 +223,12 @@ function createSpiralVisualization(containerId, dataPath) {
     .style('transition', 'all 0.3s')
     .style('white-space', 'nowrap')
     .style('min-width', '150px')
+    .style('pointer-events', 'auto')
     .text('Rural Food Desert: Baldwin');
 
   const urbanBtn = toggleContainer.append('button')
     .attr('class', 'spiral-toggle-btn active')
+    .attr('type', 'button')
     .style('padding', '0.5rem 1rem')
     .style('border', '2px solid #667eea')
     .style('background', '#667eea')
@@ -235,17 +240,9 @@ function createSpiralVisualization(containerId, dataPath) {
     .style('transition', 'all 0.3s')
     .style('white-space', 'nowrap')
     .style('min-width', '150px')
+    .style('pointer-events', 'auto')
     .text('Urban Food Desert: Maxwell Park');
 
-  const locationDisplay = container.append('div')
-    .attr('class', 'spiral-location-display')
-    .style('text-align', 'center')
-    .style('font-size', '1.5rem')
-    .style('font-weight', 'bold')
-    .style('color', '#2c3e50')
-    .style('margin-bottom', '0.5rem')
-    .style('min-height', '2rem')
-    .text('Maxwell Park, California');
   
   const vizWrap = container.append('div')
     .attr('class', 'spiral-viz-wrap')
@@ -258,11 +255,13 @@ function createSpiralVisualization(containerId, dataPath) {
   const viz = vizWrap.append('div')
     .attr('class', 'spiral-viz')
     .style('width', '100%')
-    .style('max-width', '900px')
+    .style('height', '100%')
     .style('position', 'relative');
 
   const svg = viz.append('svg')
     .attr('preserveAspectRatio', 'xMidYMid meet')
+    .attr('width', '100%')
+    .attr('height', '100%')
     .classed('spiral-svg', true);
 
   svg.append('path').attr('class', 'spiral-path')
@@ -339,7 +338,7 @@ function createSpiralVisualization(containerId, dataPath) {
     markers.exit().transition().duration(300).style('opacity', 0).remove();
     const enter = markers.enter().append('g').attr('class', 'spiral-marker-g').style('opacity', 0);
     enter.append('circle').attr('class', 'spiral-marker').style('cursor', 'pointer').style('transition', 'all 0.3s');
-    enter.append('text').attr('class', 'spiral-marker-label').attr('text-anchor', 'middle').attr('dy', -15).style('font-size', '12px').style('font-weight', 'bold').style('fill', '#2c3e50').style('pointer-events', 'none');
+    enter.append('text').attr('class', 'spiral-marker-label').attr('text-anchor', 'middle').attr('dy', -20).style('font-size', '16px').style('font-weight', 'bold').style('fill', '#2c3e50').style('pointer-events', 'none');
     const all = enter.merge(markers);
     all.transition().duration(500).style('opacity', 1).attr('transform', d => {
         const r = milesToRadius(d);
@@ -353,58 +352,107 @@ function createSpiralVisualization(containerId, dataPath) {
       const y = module.center.y + r * Math.sin(angle);
         return `translate(${x},${y})`;
       });
-    all.select('circle').transition().duration(500).attr('r', 10).attr('fill', d => getColorForDistance(d, module.currentMode)).attr('stroke', '#fff').attr('stroke-width', 2);
+    all.select('circle').transition().duration(500).attr('r', 16).attr('fill', d => getColorForDistance(d, module.currentMode)).attr('stroke', '#fff').attr('stroke-width', 2);
     all.select('.spiral-marker-label').transition().duration(500).attr('fill', d => getColorForDistance(d, module.currentMode)).text(d => `${d} mi`);
     all.select('circle').style('cursor', 'pointer').on('click', function(event, d) {
       event.stopPropagation();
       if (module.selectedDistance === d) {
-        module.selectedDistance = null;
-        d3.selectAll('.spiral-marker-g circle').transition().duration(200).attr('r', 10).attr('stroke-width', 2);
-        d3.select('#spiral-food-popup').transition().duration(200).style('opacity', 0).remove();
+        // Close popup and reset spiral position
+        resetSpiralPopup();
       } else {
         module.selectedDistance = d;
-        d3.selectAll('.spiral-marker-g circle').transition().duration(200).attr('r', 10).attr('stroke-width', 2);
-        d3.select(this).transition().duration(200).attr('r', 14).attr('stroke-width', 3);
+        d3.selectAll('.spiral-marker-g circle').transition().duration(200).attr('r', 16).attr('stroke-width', 2);
+        d3.select(this).transition().duration(200).attr('r', 22).attr('stroke-width', 3);
+        shiftSpiralLeft();
         showFoodSidebar(event, d, module.currentMode);
       }
     }).on('mouseenter', function() {
       if (module.selectedDistance === null) {
-        d3.select(this).transition().duration(200).attr('r', 12).attr('stroke-width', 2.5);
+        d3.select(this).transition().duration(200).attr('r', 19).attr('stroke-width', 2.5);
       }
     }).on('mouseleave', function() {
       if (module.selectedDistance === null) {
-        d3.select(this).transition().duration(200).attr('r', 10).attr('stroke-width', 2);
+        d3.select(this).transition().duration(200).attr('r', 16).attr('stroke-width', 2);
       }
     });
   }
 
+  function shiftSpiralLeft() {
+    container.node().classList.add('shifted-left');
+  }
+
+  function resetSpiralPosition() {
+    container.node().classList.remove('shifted-left');
+  }
+
+  function resetSpiralPopup() {
+    closeFoodSidebar();
+    resetSpiralPosition();
+    module.selectedDistance = null;
+    d3.selectAll('.spiral-marker-g circle').transition().duration(200).attr('r', 16).attr('stroke-width', 2);
+    // Hide reset button
+    d3.select('#spiral-reset-button').classed('visible', false);
+  }
+
+  function closeFoodSidebar() {
+    const popup = d3.select('#spiral-food-popup');
+    if (!popup.empty()) {
+      popup.classed('visible', false);
+      setTimeout(() => {
+        popup.remove();
+      }, 750);
+    }
+  }
+
   function showFoodSidebar(event, distance, mode) {
+    // Check if we're on slide 3 before showing popup
+    const slide3 = document.querySelector('.slide-3');
+    if (!slide3 || slide3.offsetParent === null) return;
+    
     d3.select('#spiral-food-popup').remove();
     const foods = foodImages[mode][distance] || [];
     const hasNoFood = foods === null || (foods.length === 1 && foods[0].includes('nothing.jpg'));
-    const popup = container.append('div').attr('id', 'spiral-food-popup').attr('class', 'spiral-food-popup').style('width', '100%').style('max-width', '800px').style('margin', '0.5rem auto 0').style('background', 'white').style('border-radius', '12px').style('box-shadow', '0 4px 6px rgba(0,0,0,0.1)').style('padding', '0').style('opacity', '0');
-    const header = popup.append('div').attr('class', 'panel-header').style('background', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)').style('color', 'white').style('padding', '25px').style('text-align', 'center');
-    header.append('h2').style('font-size', '24px').style('margin-bottom', '5px').style('font-weight', 'bold').text(`Food options within a ${distance} mile${distance !== 1 ? 's' : ''} radius`);
-    const content = popup.append('div').attr('class', 'panel-content').style('padding', '25px');
+    // Append to body for fixed positioning to work properly
+    const popup = d3.select('body').append('div').attr('id', 'spiral-food-popup').attr('class', 'spiral-food-popup');
+    const header = popup.append('div').attr('class', 'panel-header').style('background', 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)').style('color', 'white').style('padding', '8px 5px').style('text-align', 'center');
+    header.append('h2').style('font-size', '15px').style('margin-bottom', '2px').style('font-weight', 'bold').text(`Food options within a ${distance} mile${distance !== 1 ? 's' : ''} radius`);
+    const content = popup.append('div').attr('class', 'panel-content').style('padding', '8px 8px');
     if (hasNoFood) {
-      const noFoodContainer = content.append('div').style('text-align', 'center').style('padding', '2rem 0');
-      noFoodContainer.append('div').style('font-size', '1.5rem').style('font-weight', 'bold').style('color', '#2c3e50').style('margin-top', '1rem').text('No convenience stores or fast food options');
+      const noFoodContainer = content.append('div').style('text-align', 'center').style('padding', '1rem 0').style('display', 'flex').style('flex-direction', 'column').style('align-items', 'center').style('gap', '1rem');
+      // Show the nothing.jpg image if it exists in the foods array
+      if (foods && foods.length > 0 && foods[0].includes('nothing.jpg')) {
+        const imgContainer = noFoodContainer.append('div').style('width', '100%').style('max-width', '100%').style('display', 'flex').style('justify-content', 'center');
+        imgContainer.append('img').attr('src', foods[0]).attr('alt', 'No food options').style('width', '100%').style('max-width', '100%').style('max-height', '200px').style('height', 'auto').style('object-fit', 'contain').style('display', 'block');
+      }
+      noFoodContainer.append('div').style('font-size', '1.2rem').style('font-weight', 'bold').style('color', '#2c3e50').text('No convenience stores or fast food options');
     } else {
-      const imageGrid = content.append('div').style('display', 'grid').style('grid-template-columns', 'repeat(auto-fit, minmax(250px, 1fr))').style('gap', '1.5rem').style('max-width', '100%');
+      const imageGrid = content.append('div').style('display', 'flex').style('flex-direction', 'column').style('gap', '0.75rem').style('max-width', '100%').style('align-items', 'center');
       foods.forEach((imagePath) => {
-        const imgContainer = imageGrid.append('div').style('border-radius', '12px').style('overflow', 'visible').style('box-shadow', '0 4px 12px rgba(0,0,0,0.15)').style('background', 'white').style('display', 'flex').style('flex-direction', 'column').style('align-items', 'center');
-        imgContainer.append('img').attr('src', imagePath).attr('alt', 'Food option').style('width', '100%').style('max-width', '250px').style('height', 'auto').style('object-fit', 'contain').style('display', 'block').style('padding', '10px');
+        const imgContainer = imageGrid.append('div').style('border-radius', '8px').style('overflow', 'visible').style('box-shadow', '0 2px 8px rgba(0,0,0,0.1)').style('background', 'white').style('display', 'flex').style('flex-direction', 'column').style('align-items', 'center').style('width', '100%').style('max-width', '100%');
+        imgContainer.append('img').attr('src', imagePath).attr('alt', 'Food option').style('width', '100%').style('max-width', '100%').style('max-height', '200px').style('height', 'auto').style('object-fit', 'contain').style('display', 'block').style('padding', '4px');
       });
     }
-    popup.transition().duration(300).style('opacity', '1');
+    // Show reset button
+    d3.select('#spiral-reset-button').classed('visible', true);
+    
+    // Force a reflow, then add visible class for transition
+    void popup.node().offsetHeight;
+    setTimeout(() => {
+      popup.classed('visible', true);
+    }, 100);
   }
 
   function render() {
-    module.viewW = Math.max(600, viz.node().clientWidth || 650);
-    module.viewH = Math.max(600, viz.node().clientHeight || 650);
+    // Get dimensions from the container (which now fills the right section)
+    const containerRect = container.node().getBoundingClientRect();
+    const containerWidth = containerRect.width || vizWrap.node().clientWidth || 800;
+    const containerHeight = containerRect.height || vizWrap.node().clientHeight || 800;
+    // Use the full available size
+    module.viewW = Math.max(containerWidth, 600);
+    module.viewH = Math.max(containerHeight, module.viewW * 0.9);
     svg.attr('viewBox', `0 0 ${module.viewW} ${module.viewH}`);
     module.center = { x: module.viewW / 2, y: module.viewH / 2 };
-    module.maxVisualRadius = Math.min(module.viewW, module.viewH) * 0.42;
+    module.maxVisualRadius = Math.min(module.viewW, module.viewH) * 0.4;
     const line = d3.line();
     svg.select('.spiral-path').transition().duration(500).attr('d', line(buildSpiralPoints()));
     placeMarkers();
@@ -415,20 +463,33 @@ function createSpiralVisualization(containerId, dataPath) {
     module.currentDistances = mode === 'urban' ? module.urbanDistances : module.ruralDistances;
     if (mode === 'urban') {
       locationDisplay.text('Maxwell Park, California');
+      urbanBtn.classed('active', true);
+      ruralBtn.classed('active', false);
       urbanBtn.style('background', '#667eea').style('color', 'white');
       ruralBtn.style('background', 'white').style('color', '#667eea');
     } else {
       locationDisplay.text('Baldwin, Florida');
+      ruralBtn.classed('active', true);
+      urbanBtn.classed('active', false);
       ruralBtn.style('background', '#667eea').style('color', 'white');
       urbanBtn.style('background', 'white').style('color', '#667eea');
     }
     module.selectedDistance = null;
-    d3.select('#spiral-food-popup').transition().duration(200).style('opacity', 0).remove();
+    resetSpiralPopup();
     render();
   }
 
-  urbanBtn.on('click', () => switchMode('urban'));
-  ruralBtn.on('click', () => switchMode('rural'));
+  urbanBtn.on('click', function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    switchMode('urban');
+  });
+  
+  ruralBtn.on('click', function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    switchMode('rural');
+  });
   d3.csv(dataPath).then(rows => {
     module.lastRows = rows;
     render();
@@ -439,6 +500,15 @@ function createSpiralVisualization(containerId, dataPath) {
   const resizeHandler = () => render();
   window.addEventListener('resize', resizeHandler);
   setTimeout(() => render(), 60);
+  
+  // Set up reset button event listener
+  const resetBtn = document.getElementById('spiral-reset-button');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', resetSpiralPopup);
+  }
+  
+  // Expose reset function globally for button access
+  window.resetSpiralPopup = resetSpiralPopup;
 }
 
 function createDistanceSlider(containerId, dataPath) {
@@ -630,7 +700,7 @@ function createDistanceSlider(containerId, dataPath) {
 class DashboardCarousel {
     constructor() {
         this.currentSlide = 0;
-        this.totalSlides = 6;
+        this.totalSlides = 7;
         this.isTransitioning = false;
         this.transitionDuration = 500; // ms
         
@@ -716,16 +786,26 @@ class DashboardCarousel {
             indicator.classList.toggle('active', index === this.currentSlide);
         });
 
-        // Hide reset button if not on slide 4 (index 3)
+        // Hide reset button if not on slide 5 (maps, index 4)
         const resetButton = document.getElementById('reset-button');
         if (resetButton) {
-            if (this.currentSlide !== 3) {
+            if (this.currentSlide !== 4) {
                 resetButton.classList.remove('visible');
             } else {
-                // Reset maps when returning to slide 4
+                // Reset maps when returning to slide 5
                 if (typeof resetBothMaps === 'function') {
                     resetBothMaps();
                 }
+            }
+        }
+
+        // Clean up spiral popup and reset position when leaving slide 3
+        if (this.currentSlide !== 2) {
+            d3.select('#spiral-food-popup').remove();
+            d3.select('#spiral-reset-button').classed('visible', false);
+            const spiralContainer = document.getElementById('spiral-container');
+            if (spiralContainer) {
+                spiralContainer.classList.remove('shifted-left');
             }
         }
 
@@ -748,40 +828,37 @@ class DashboardCarousel {
     renderSlideContent() {
         // Re-render or refresh visualizations when slide becomes visible
         switch(this.currentSlide) {
-            case 1: // Slide 2: Spiral visualization
-                console.log('Rendering slide 2 - Spiral');
+            case 2: // Slide 3: Spiral visualization
+                console.log('Rendering slide 3 - Spiral');
                 const spiralContainer = document.getElementById('spiral-container');
                 if (spiralContainer && spiralContainer.offsetParent !== null) {
                     // Trigger window resize to refresh D3
                     window.dispatchEvent(new Event('resize'));
+                    // Reset spiral position when entering slide
+                    spiralContainer.classList.remove('shifted-left');
+                    // Remove popup if it exists
+                    d3.select('#spiral-food-popup').remove();
                 }
                 break;
-            case 2: // Slide 3: Distance slider
-                console.log('Rendering slide 3 - Distance slider');
+            case 3: // Slide 4: Distance slider
+                console.log('Rendering slide 4 - Distance slider');
                 const sliderContainer = document.getElementById('distance-slider-container');
                 if (sliderContainer && sliderContainer.offsetParent !== null) {
                     // Trigger window resize to refresh D3
                     window.dispatchEvent(new Event('resize'));
                 }
                 break;
-            case 3: // Slide 4: Maps
-                console.log('Rendering slide 4 - Maps');
+            case 4: // Slide 5: Maps
+                console.log('Rendering slide 5 - Maps');
                 const mapLeft = document.querySelector('#map-left svg');
                 const mapRight = document.querySelector('#map-right svg');
                 if (mapLeft || mapRight) {
                     window.dispatchEvent(new Event('resize'));
                 }
                 break;
-            case 4: // Slide 5: Community orgs
-                console.log('Rendering slide 7 - Community organizations');
+            case 5: // Slide 6: Community orgs
+                console.log('Rendering slide 6 - Community organizations');
                 window.dispatchEvent(new Event('resize'));
-                break;
-            case 5: // Slide 6: Meet The Team
-                console.log('Rendering slide 8 - Meet The Team');
-                const teamContainer = document.getElementById('team-container');
-                if (teamContainer && teamContainer.offsetParent !== null) {
-                    createTeamSection('#team-container');
-                }
                 break;
         }
     }
@@ -797,242 +874,6 @@ class DashboardCarousel {
     getCurrentSlide() {
         return this.currentSlide;
     }
-}
-
-// Create Team Section
-function createTeamSection(containerId) {
-    const container = d3.select(containerId);
-    if (container.empty()) {
-        console.error(`Container ${containerId} not found`);
-        return null;
-    }
-
-    // Clear any existing content
-    container.selectAll("*").remove();
-
-    const teamMembers = [
-        {
-            name: "Oscar Boccelli",
-            year: "'26",
-            major: "Economics",
-            house: "Currier House",
-            image: "images/oscar-boccelli.jpg"
-        },
-        {
-            name: "Dani Ebaseh-Onofa",
-            year: "'26",
-            major: "Computer Science & Neuroscience",
-            house: "Cabot House",
-            image: "images/dani-onofa.jpg"
-        },
-        {
-            name: "Garland Catlette",
-            year: "'26",
-            major: "Computer Science",
-            house: "Currier House",
-            image: "images/garland-catlette.jpg"
-        }
-    ];
-
-    const containerRect = container.node().getBoundingClientRect();
-    const width = containerRect.width > 0 ? containerRect.width : window.innerWidth - 100;
-    const height = 800;
-
-    const svg = container.append("svg")
-        .attr("width", width)
-        .attr("height", height);
-
-    // Create clipPath for circular images
-    const defs = svg.append("defs");
-    const clipPath = defs.append("clipPath")
-        .attr("id", "team-circle-clip");
-    clipPath.append("circle")
-        .attr("r", 120)
-        .attr("cx", 0)
-        .attr("cy", 0);
-
-    const circleRadius = 120;
-    const spacing = 100;
-    const startX = (width - (3 * (circleRadius * 2 + spacing) - spacing)) / 2;
-    const startY = 220; // Increased from 150 to push photos down more
-
-    // Create team member groups
-    const teamGroups = svg.selectAll(".team-member")
-        .data(teamMembers)
-        .join("g")
-        .attr("class", "team-member")
-        .attr("transform", (d, i) => {
-            const x = startX + i * (circleRadius * 2 + spacing) + circleRadius;
-            return `translate(${x}, ${startY})`;
-        });
-
-    // Add hover circle
-    teamGroups.append("circle")
-        .attr("r", circleRadius)
-        .attr("fill", "transparent")
-        .attr("stroke", "#667eea")
-        .attr("stroke-width", 3)
-        .attr("opacity", 0)
-        .attr("class", "team-hover-circle");
-
-    // Add headshot images
-    teamGroups.append("image")
-        .attr("href", d => d.image)
-        .attr("x", -circleRadius)
-        .attr("y", -circleRadius)
-        .attr("width", circleRadius * 2)
-        .attr("height", circleRadius * 2)
-        .attr("clip-path", "url(#team-circle-clip)")
-        .attr("class", "team-image")
-        .attr("preserveAspectRatio", "xMidYMid slice")
-        .style("transition", "all 0.3s")
-        .on("error", function() {
-            d3.select(this).style("display", "none");
-        });
-
-    // Add name, year, major, house text below each circle
-    const textStartY = circleRadius + 30; // Relative to the circle position
-    teamGroups.each(function(d, i) {
-        const g = d3.select(this);
-        const x = startX + i * (circleRadius * 2 + spacing) + circleRadius;
-        
-        g.append("text")
-            .attr("text-anchor", "middle")
-            .attr("x", 0)
-            .attr("y", textStartY)
-            .attr("class", "team-name")
-            .style("font-size", "20px")
-            .style("font-weight", "bold")
-            .style("fill", "#2c3e50")
-            .text(`${d.name} ${d.year}`);
-
-        g.append("text")
-            .attr("text-anchor", "middle")
-            .attr("x", 0)
-            .attr("y", textStartY + 25)
-            .attr("class", "team-major")
-            .style("font-size", "16px")
-            .style("fill", "#495057")
-            .text(d.major);
-
-        g.append("text")
-            .attr("text-anchor", "middle")
-            .attr("x", 0)
-            .attr("y", textStartY + 50)
-            .attr("class", "team-house")
-            .style("font-size", "16px")
-            .style("fill", "#495057")
-            .text(d.house);
-    });
-
-    // Add hover effects
-    teamGroups
-        .on("mouseenter", function() {
-            const g = d3.select(this);
-            g.select(".team-hover-circle")
-                .transition()
-                .duration(200)
-                .attr("opacity", 1)
-                .attr("stroke-width", 4);
-            g.select(".team-image")
-                .transition()
-                .duration(200)
-                .attr("width", circleRadius * 2.1)
-                .attr("height", circleRadius * 2.1)
-                .attr("x", -circleRadius * 1.05)
-                .attr("y", -circleRadius * 1.05);
-        })
-        .on("mouseleave", function() {
-            const g = d3.select(this);
-            g.select(".team-hover-circle")
-                .transition()
-                .duration(200)
-                .attr("opacity", 0)
-                .attr("stroke-width", 3);
-            g.select(".team-image")
-                .transition()
-                .duration(200)
-                .attr("width", circleRadius * 2)
-                .attr("height", circleRadius * 2)
-                .attr("x", -circleRadius)
-                .attr("y", -circleRadius);
-        });
-
-    // Add mission statement container
-    const missionY = startY + circleRadius + 120; // Position relative to photos and text
-    const missionWidth = width * 0.8;
-    const missionX = (width - missionWidth) / 2;
-
-    const missionGroup = svg.append("g")
-        .attr("class", "mission-statement");
-
-    // Mission Statement title
-    missionGroup.append("text")
-        .attr("x", missionX + 20)
-        .attr("y", missionY + 35)
-        .attr("class", "mission-title")
-        .style("font-size", "18px")
-        .style("font-weight", "bold")
-        .style("fill", "#2c3e50")
-        .text("Mission Statement:");
-
-    // Mission Statement text
-    const missionText = "Given our team's collective experiences with food deserts, we wanted to dive deeper into their impacts that are not typically studied, namely the effects of food deserts on individual and associated health outcomes to raise awareness on their interconnectedness and various community organizations helping to fight against food insecurity and promote health in vulnerable populations.";
-
-    const missionTextElement = missionGroup.append("text")
-        .attr("x", missionX + 20)
-        .attr("y", missionY + 60)
-        .attr("class", "mission-text")
-        .style("font-size", "15px")
-        .style("fill", "#495057")
-        .text(missionText);
-
-    // Wrap text function
-    function wrapText(textElement, width) {
-        let totalLines = 0;
-        textElement.each(function() {
-            const text = d3.select(this);
-            const words = text.text().split(/\s+/).reverse();
-            let word;
-            let line = [];
-            let lineNumber = 0;
-            const lineHeight = 1.4;
-            const y = text.attr("y");
-            const x = text.attr("x");
-            let tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", 0);
-
-            while (word = words.pop()) {
-                line.push(word);
-                tspan.text(line.join(" "));
-                if (tspan.node().getComputedTextLength() > width) {
-                    line.pop();
-                    tspan.text(line.join(" "));
-                    line = [word];
-                    tspan = text.append("tspan").attr("x", x).attr("y", y).attr("dy", ++lineNumber * lineHeight + "em").text(word);
-                }
-            }
-            totalLines = lineNumber + 1;
-        });
-        return totalLines;
-    }
-
-    // Wrap text and get line count
-    const lineCount = wrapText(missionTextElement, missionWidth - 40);
-    
-    // Calculate dynamic height based on wrapped text
-    const lineHeight = 15 * 1.4; // font-size * line-height
-    const dynamicHeight = 60 + (lineCount * lineHeight) + 30; // top padding + text + bottom padding
-    
-    // Add black border rectangle with dynamic height (add it BEFORE text so it's behind)
-    const missionRect = missionGroup.insert("rect", ":first-child")
-        .attr("x", missionX)
-        .attr("y", missionY)
-        .attr("width", missionWidth)
-        .attr("height", dynamicHeight)
-        .attr("fill", "white")
-        .attr("stroke", "black")
-        .attr("stroke-width", 2)
-        .attr("rx", 8);
 }
 
 // Initialize carousel when document is ready

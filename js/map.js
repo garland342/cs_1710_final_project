@@ -20,7 +20,7 @@ const COMPARISON_METRICS = [
 // STATE
 // ============================================
 
-let currentComparisonMetric = COMPARISON_METRICS[1].value;
+let currentComparisonMetric = COMPARISON_METRICS[0].value; // Default to Diabetes
 let isZoomed = false;
 let currentStateName = null;
 let currentStateData = null;
@@ -38,7 +38,7 @@ let barChartsData = {
     stateLevel: null,
     regionalLevel: null,
     currentView: 'state',
-    currentMetric: 'DEPRESSION_CrudePrev'  // Track which metric is selected
+    currentMetric: 'DIABETES_CrudePrev'  // Track which metric is selected
 };
 
 // State to region mapping
@@ -915,6 +915,18 @@ function createBarChart(containerId, data, metric, title, colorScheme) {
         .domain([0, d3.max(data, d => d[metric])])
         .interpolator(colorScheme);
 
+    // Create tooltip/label element for displaying percentage on hover
+    const tooltip = g.append('text')
+        .attr('class', 'bar-tooltip')
+        .attr('x', width / 2)
+        .attr('y', -10)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '12px')
+        .style('font-weight', 'bold')
+        .style('fill', '#333')
+        .style('opacity', 0)
+        .style('pointer-events', 'none');
+
     // Bars
     g.selectAll('.bar')
         .data(data)
@@ -925,7 +937,24 @@ function createBarChart(containerId, data, metric, title, colorScheme) {
         .attr('width', x.bandwidth())
         .attr('height', d => height - y(d[metric]))
         .attr('fill', d => color(d[metric]))
-        .attr('rx', 3);
+        .attr('rx', 3)
+        .on('mouseover', function(event, d) {
+            // Show tooltip at the top with exact percentage
+            const percentage = d[metric].toFixed(2);
+            tooltip
+                .text(`${percentage}%`)
+                .attr('x', x(d.name) + x.bandwidth() / 2)
+                .transition()
+                .duration(200)
+                .style('opacity', 1);
+        })
+        .on('mouseout', function(event, d) {
+            // Hide tooltip
+            tooltip
+                .transition()
+                .duration(200)
+                .style('opacity', 0);
+        });
 
     // X-axis
     g.append('g')

@@ -9,6 +9,7 @@
 <body>
     <!-- RESET BUTTON - Outside carousel for fixed positioning -->
     <button id="reset-button">← Back to National View</button>
+     <button id="spiral-reset-button">← Reset Spiral</button>
     
     <div class="carousel-container">
         <div class="carousel-wrapper">
@@ -23,40 +24,57 @@
             </section>
 
             <!-- ============================================ -->
-            <!-- SLIDE 2: FOOD DESERT DEFINITION & SPIRAL -->
+            <!-- SLIDE 2: FOOD DESERT DEFINITION -->
             <!-- ============================================ -->
             <section class="carousel-slide slide-2">
-                <main class="split-layout">
-                    <section class="left-section">
-                        <h2>What is a Food Desert?</h2>
+                <section class="new-section-header">
+                    <p>What is a Food Desert?</p>
+                </section>
+                
+                <section class="definition-section">
+                    <div class="content-wrapper">
                         <p class="definition-box">
                             <strong>USDA Definition:</strong> A census tract qualifies as a food desert if it meets low-income criteria and has limited access to supermarkets—defined as being more than <strong>1 mile</strong> from a supermarket in urban areas, or more than <strong>10 miles</strong> in most rural areas, with up to <strong>20 miles</strong> in particularly remote or sparsely populated rural tracts.
                         </p>
                         <img src="https://images.unsplash.com/photo-1588964895597-cfccd6e2dbf9?w=800&q=80" 
                             alt="Empty grocery store shelves during shortage" 
                             style="width: 100%; 
-                                    max-width: 500px; 
-                                    height: 400px;
+                                    max-width: 700px; 
+                                    height: 560px;
                                     object-fit: cover;
                                     margin-top: 1.5rem; 
                                     border-radius: 8px; 
                                     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
                                     display: block;">
-                    </section>
-
-                    <section class="right-section">
-                        <h2>The Food Access Spiral: Close Junk & Distant Nutrition in Rural and Urban Food Deserts</h2>
-                        <div id="spiral-container"></div>
-                    </section>
-                </main>
+                    </div>
+                </section>
             </section>
 
             <!-- ============================================ -->
-            <!-- SLIDE 3: DISTANCE SLIDER -->
+            <!-- SLIDE 3: FOOD ACCESS SPIRAL -->
             <!-- ============================================ -->
             <section class="carousel-slide slide-3">
+                <section class="new-section-header">
+                    <p>The Food Access Spiral: Close Junk & Distant Nutrition in Rural and Urban Food Deserts</p>
+                </section>
+                
+                <p class="spiral-instruction-text" id="spiral-instruction-text">Click on each distance to uncover food quality in rural and urban food deserts</p>
+                
+                <section class="spiral-section" id="spiral-container">
+                    <!-- Spiral visualization will be dynamically inserted here -->
+                </section>
+            </section>
+
+            <!-- ============================================ -->
+            <!-- SLIDE 4: DISTANCE SLIDER -->
+            <!-- ============================================ -->
+            <section class="carousel-slide slide-4">
                 <section class="geography-section">
                     <p>From Half a Mile to Twenty: How Geography Expands the Distance to Fresh Food</p>
+                </section>
+
+                <section class="slider-instruction-section">
+                    <p>Use the toggle buttons to filter by geography and income level. Drag the slider handle or click on distance markers to explore how many census tracts have low access to supermarkets at different distances. The bar chart shows the distribution across all available distances for your selected filters.</p>
                 </section>
 
                 <section style="width: 100%; margin: 2rem auto; padding: 0 2rem;">
@@ -65,11 +83,11 @@
             </section>
 
             <!-- ============================================ -->
-            <!-- SLIDE 4: DUAL MAPS & COMPARISON -->
+            <!-- SLIDE 5: DUAL MAPS & COMPARISON -->
             <!-- ============================================ -->
-            <section class="carousel-slide slide-4">
+            <section class="carousel-slide slide-5">
                 <div id="map-header">
-                    <p>Comparing Food Insecurity with Health Outcomes</p>
+                    <p>Where Hunger and Health Collide: Charting the South and West’s Disproportionate Burden</p>
                     <p style="font-size: 0.95rem; margin-top: 10px;">Click on any state in either map to zoom in and compare county-level data</p>
                 </div>
                 
@@ -81,7 +99,6 @@
                         <div class="map-section">
                             <div class="map-header-section map-header-section-styled">
                                 <h3>Food Insecurity Across the Nation</h3>
-            
                             </div>
                             <div class="map-content">
                                 <div id="map-left"></div>
@@ -98,8 +115,8 @@
                                 <div class="metric-selector">
                                     <label for="comparison-metric-select">Compare with:</label>
                                     <select id="comparison-metric-select">
-                                        <option value="DEPRESSION_CrudePrev" selected>Depression</option>
-                                        <option value="DIABETES_CrudePrev">Diabetes</option>
+                                        <option value="DIABETES_CrudePrev" selected>Diabetes</option>
+                                        <option value="DEPRESSION_CrudePrev">Depression</option>
                                         <option value="BPHIGH_CrudePrev">High Blood Pressure</option>
                                     </select>
                                 </div>
@@ -140,9 +157,9 @@
             </section>
 
             <!-- ============================================ -->
-            <!-- SLIDE 5: COMMUNITY ORGANIZATIONS -->
+            <!-- SLIDE 6: COMMUNITY ORGANIZATIONS -->
             <!-- ============================================ -->
-            <section class="carousel-slide slide-7">
+            <section class="carousel-slide slide-6">
                 <section class="new-section-header">
                     <p>Communities Leading the Way</p>
                 </section>
@@ -155,14 +172,40 @@
             </section>
 
             <!-- ============================================ -->
-            <!-- SLIDE 6: MEET THE TEAM -->
+            <!-- SLIDE 7: MEET THE TEAM -->
             <!-- ============================================ -->
-            <section class="carousel-slide slide-8">
-                <section class="new-section-header">
-                    <p>Meet The Team</p>
+            <section class="carousel-slide slide-7">
+                <section class="team-header">
+                    <h2>Meet The Team</h2>
                 </section>
-
-                <div id="team-container"></div>
+                
+                <section class="team-members">
+                    <div class="team-member">
+                        <img src="images/oscar-boccelli.jpg" alt="Oscar Boccelli" class="team-photo">
+                        <h3 class="team-name">Oscar Boccelli '26</h3>
+                        <p class="team-major">Economics</p>
+                        <p class="team-house">Currier House</p>
+                    </div>
+                    
+                    <div class="team-member">
+                        <img src="images/dani-onofa.jpg" alt="Dani Ebaseh-Onofa" class="team-photo">
+                        <h3 class="team-name">Dani Ebaseh-Onofa '26</h3>
+                        <p class="team-major">Computer Science & Neuroscience</p>
+                        <p class="team-house">Cabot House</p>
+                    </div>
+                    
+                    <div class="team-member">
+                        <img src="images/garland-catlette.jpg" alt="Garland Catlette" class="team-photo">
+                        <h3 class="team-name">Garland Catlette '26</h3>
+                        <p class="team-major">Computer Science</p>
+                        <p class="team-house">Currier House</p>
+                    </div>
+                </section>
+                
+                <section class="mission-statement">
+                    <h3>Mission Statement:</h3>
+                    <p>Given our team's collective experiences with food deserts, we wanted to dive deeper into their impacts that are not typically studied, namely the effects of food deserts on individual and associated health outcomes to raise awareness on their interconnectedness and various community organizations helping to fight against food insecurity and promote health in vulnerable populations.</p>
+                </section>
             </section>
 
         </div>
@@ -179,6 +222,7 @@
                 <span class="indicator" data-slide="3" aria-label="Slide 4"></span>
                 <span class="indicator" data-slide="4" aria-label="Slide 5"></span>
                 <span class="indicator" data-slide="5" aria-label="Slide 6"></span>
+                <span class="indicator" data-slide="6" aria-label="Slide 7"></span>
             </div>
             <button class="carousel-btn next-btn" aria-label="Next slide">Next →</button>
         </div>

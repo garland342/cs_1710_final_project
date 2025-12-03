@@ -106,6 +106,34 @@ body {
     display: block;
 }
 
+#spiral-reset-button {
+    position: fixed;
+    top: 180px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    display: none;
+    z-index: 1000;
+    transition: all 0.3s;
+}
+
+#spiral-reset-button:hover {
+    transform: translateX(-50%) translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+#spiral-reset-button.visible {
+    display: block;
+}
+
 /* Regional Graph Panel - shown on initial view */
 #regional-graph-panel {
     width: 400px;
@@ -812,10 +840,6 @@ p, li {
   display: block;
 }
 
-/* Move spiral up */
-#spiral-container {
-  margin-top: -45px;
-}
 
 .spiral-meta {
   display: none;  
@@ -889,7 +913,7 @@ p, li {
 }
 
 .spiral-marker-label {
-  font-size: 11px;
+  font-size: 16px;
   fill: #2c3e50;
 }
 
@@ -1198,16 +1222,20 @@ p, li {
 .carousel-container {
     width: 100%;
     height: 100vh;
-    position: static;
+    max-height: 100vh;
+    position: relative;
     overflow: hidden;
     background: #f5f7fa;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Carousel Wrapper - Contains all slides */
 .carousel-wrapper {
     display: flex;
     width: 100%;
-    height: 100%;
+    flex: 1;
+    min-height: 0;
     transition: transform 0.5s ease;
 }
 
@@ -1216,12 +1244,14 @@ p, li {
     min-width: 100%;
     width: 100%;
     height: 100%;
+    max-height: 100%;
     overflow-y: auto;
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
     padding: 0;
     background: #f5f7fa;
+    box-sizing: border-box;
 }
 
 /* Custom scrollbar for slides */
@@ -1265,66 +1295,219 @@ p, li {
     max-width: 900px;
 }
 
-/* Slide 2: Definition + Spiral */
+/* Slide 2: Food Desert Definition */
 .slide-2 {
     padding: 40px 20px;
     display: flex;
-    align-items: stretch;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
     overflow-y: auto;
-}
-
-.slide-2 main.split-layout {
-    width: 100%;
-    max-width: 1400px;
-    display: flex;
-    flex-direction: row;
-}
-
-.slide-2 .left-section {
-    flex: 1;
-    min-height: 600px;
-    padding: 30px 40px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.slide-2 .right-section {
-    flex: 1;
-    min-height: 600px;
-    padding: 30px 40px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.slide-2 #spiral-container {
-    width: 100%;
     height: 100%;
-    min-height: 500px;
+    max-height: 100%;
+    box-sizing: border-box;
 }
 
-/* Slide 3: Distance Slider */
+.slide-2 .new-section-header {
+    margin: 0 0 30px 0;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.slide-2 .definition-section {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+}
+
+.slide-2 .definition-section .content-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.slide-2 .definition-section .definition-box {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+    width: 100%;
+    max-width: 1100px;
+    font-size: 1.15rem;
+    line-height: 1.7;
+}
+
+/* Slide 3: Food Access Spiral */
 .slide-3 {
-    padding: 40px 10px;
+    padding: 20px 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
     overflow-y: auto;
+    height: 100%;
+    max-height: 100%;
+    box-sizing: border-box;
+    position: relative;
 }
 
-.slide-3 .geography-section {
-    margin: 0 0 40px 0;
+.slide-3 .new-section-header {
+    margin: 0 0 25px 0;
+    padding: 0;
+    flex-shrink: 0;
+    text-align: center;
+    width: 100%;
+}
+
+.slide-3 .spiral-instruction-text {
+    margin: 0 0 25px 0;
+    padding: 0 20px;
+    flex-shrink: 0;
+    text-align: center;
+    color: #666;
+    font-size: 0.95rem;
+    font-style: italic;
+}
+
+.slide-3 .spiral-section {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    position: relative;
+    min-height: 0;
+    overflow: hidden;
+    padding-top: 0;
+}
+
+.slide-3 #spiral-container {
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    position: relative;
+    left: auto;
+    top: auto;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    transition: transform 750ms ease-in-out;
+    transform: translateX(0);
+}
+
+.slide-3 #spiral-container.shifted-left {
+    transform: translateX(calc(-18vw));
+}
+
+.slide-3 #spiral-container .spiral-location-display {
+    flex-shrink: 0;
+    margin-top: 0;
+    margin-bottom: 2.5rem;
+}
+
+.slide-3 #spiral-container .spiral-toggle-container {
+    flex-shrink: 0;
+    margin-bottom: 1rem;
+    z-index: 100;
+    position: relative;
+}
+
+.slide-3 .spiral-toggle-btn {
+    pointer-events: auto !important;
+    z-index: 101;
+    position: relative;
+}
+
+.slide-3 #spiral-container .spiral-viz-wrap {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.slide-3 #spiral-container .spiral-viz {
+    width: 100%;
+    height: 100%;
+    max-height: 100%;
+}
+
+.slide-3 #spiral-container .spiral-viz svg {
+    width: 100%;
+    height: 100%;
+}
+
+#spiral-food-popup {
+    position: fixed;
+    right: 30px;
+    top: 50%;
+    max-height: 70vh;
+    max-width: 38%;
+    width: 38%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 10000;
+    box-sizing: border-box;
+    transition: transform 750ms ease-in-out, opacity 750ms ease-in-out;
+    transform: translateX(calc(100% + 40px)) translateY(-50%);
+    opacity: 0;
+    pointer-events: none;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+#spiral-food-popup.visible {
+    transform: translateX(0) translateY(-50%);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Slide 4: Distance Slider */
+.slide-4 {
+    padding: 20px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+.slide-4 .geography-section {
+    margin: 0 0 20px 0;
     padding: 20px 20px;
     flex-shrink: 0;
     width: 100%;
 }
 
-.slide-3 #distance-slider-container {
+.slide-4 .slider-instruction-section {
+    text-align: center;
+    padding: 0 40px 20px 40px;
+    max-width: 1000px;
+    margin: 0 auto 20px auto;
+    flex-shrink: 0;
+}
+
+.slide-4 .slider-instruction-section p {
+    font-size: 0.95rem;
+    font-style: italic;
+    color: #666;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.slide-4 #distance-slider-container {
     width: 100%;
     max-width: 100%;
     margin: 0 auto;
@@ -1332,15 +1515,15 @@ p, li {
     padding: 0 20px;
 }
 
-/* Slide 4: Dual Maps */
-.slide-4 {
+/* Slide 5: Dual Maps */
+.slide-5 {
     padding: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
 
-.slide-4 #map-header {
+.slide-5 #map-header {
     padding: 20px;
     text-align: center;
     background: white;
@@ -1348,17 +1531,17 @@ p, li {
     flex-shrink: 0;
 }
 
-.slide-4 #map-header p {
+.slide-5 #map-header p {
     margin: 0;
     color: #2c3e50;
 }
 
-.slide-4 #map-header p:first-child {
+.slide-5 #map-header p:first-child {
     font-size: 1.8rem;
     font-weight: bold;
 }
 
-.slide-4 #dual-map-wrapper {
+.slide-5 #dual-map-wrapper {
     flex: 1;
     overflow-y: auto;
     padding: 20px;
@@ -1366,72 +1549,164 @@ p, li {
 
 /* Slide 5: Food Insecurity Charts */
 
-/* Slide 7: Community Orgs */
+/* Slide 6: Community Orgs */
+.slide-6 {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    box-sizing: border-box;
+}
+
+.slide-6 .new-section-header {
+    margin: 0 0 20px 0;
+    padding: 0;
+}
+
+.slide-6 .voronoi-instruction {
+    margin: 0 0 30px 0;
+    padding: 0;
+}
+
+.slide-6 #voronoi-container {
+    width: 100%;
+    max-width: 100%;
+    flex: 1;
+    background: transparent;
+}
+
+/* Slide 7: Meet The Team */
 .slide-7 {
     padding: 40px 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
+    overflow-y: auto;
+    height: 100%;
+    max-height: 100%;
+    box-sizing: border-box;
+    background: #f5f5f5;
+    position: relative;
 }
 
-.slide-7 .new-section-header {
-    margin: 0 0 20px 0;
+.slide-7 .team-header {
+    margin: 0 0 40px 0;
     padding: 0;
-}
-
-.slide-7 .voronoi-instruction {
-    margin: 0 0 30px 0;
-    padding: 0;
-}
-
-.slide-7 #voronoi-container {
+    flex-shrink: 0;
+    text-align: center;
     width: 100%;
-    max-width: 100%;
-    flex: 1;
-    background: transparent;
 }
 
-/* Slide 8: Meet The Team */
-.slide-8 {
-    padding: 40px 20px;
+.slide-7 .team-header h2 {
+    font-size: 3rem;
+    font-weight: 600;
+    color: #000;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.slide-7 .team-members {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 60px;
+    margin: 0 0 35px 0;
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 1400px;
+    padding: 0 20px;
+}
+
+.slide-7 .team-member {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-}
-
-.slide-8 .new-section-header {
-    margin: 0 0 40px 0;
-    padding: 0;
-}
-
-#team-container {
-    width: 100%;
-    max-width: 100%;
+    text-align: center;
     flex: 1;
-    background: transparent;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 600px;
+    max-width: 400px;
+}
+
+.slide-7 .team-photo {
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+    border: none;
+    box-shadow: none;
+}
+
+.slide-7 .team-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #000;
+    margin: 0 0 10px 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.slide-7 .team-major {
+    font-size: 1.15rem;
+    color: #000;
+    margin: 0 0 6px 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.slide-7 .team-house {
+    font-size: 1.15rem;
+    color: #000;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.slide-7 .mission-statement {
+    width: 100%;
+    max-width: 1400px;
+    background: white;
+    border: 1px solid #000;
+    border-radius: 0;
+    padding: 40px 50px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    margin-top: 20px;
+    margin-bottom: 0;
+}
+
+.slide-7 .mission-statement h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #000;
+    margin: 0 0 20px 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.slide-7 .mission-statement p {
+    font-size: 1.2rem;
+    color: #000;
+    line-height: 1.8;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Carousel Navigation Controls */
 .carousel-controls {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
+    position: relative;
+    bottom: auto;
+    left: auto;
+    transform: none;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 30px;
     z-index: 1000;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.95);
     padding: 20px 30px;
-    border-radius: 50px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    /* backdrop-filter: blur(5px); */
+    margin: 0;
+    border-top: 1px solid #e0e0e0;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
 }
 
 /* Navigation Buttons */
@@ -1504,7 +1779,6 @@ p, li {
 /* Responsive Design */
 @media (max-width: 1024px) {
     .carousel-controls {
-        bottom: 20px;
         gap: 20px;
         padding: 15px 20px;
     }
@@ -1597,6 +1871,30 @@ p, li {
 
     .carousel-slide {
         padding: 20px 10px !important;
+    }
+
+    /* Slide 7: Meet The Team - Responsive */
+    .slide-7 .team-header h2 {
+        font-size: 1.8rem;
+    }
+
+    .slide-7 .team-members {
+        flex-direction: column;
+        gap: 40px;
+        align-items: center;
+    }
+
+    .slide-7 .team-photo {
+        width: 150px;
+        height: 150px;
+    }
+
+    .slide-7 .team-name {
+        font-size: 1.1rem;
+    }
+
+    .slide-7 .mission-statement {
+        padding: 20px 25px;
     }
 }
 
