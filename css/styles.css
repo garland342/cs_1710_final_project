@@ -1465,6 +1465,28 @@ p, li {
     height: 100%;
 }
 
+/* Spiral location map container */
+.spiral-map-container {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    max-height: 25vh;
+    max-width: 25%;
+    width: 25%;
+    min-width: 200px;
+    z-index: 100;
+    box-sizing: border-box;
+}
+
+.spiral-location-map {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    display: block;
+}
+
 #spiral-food-popup {
     position: absolute;
     right: 30px;
@@ -1491,8 +1513,16 @@ p, li {
     pointer-events: auto;
 }
 
-/* Responsive styles for spiral popup */
+/* Responsive styles for spiral popup and map */
 @media (max-width: 1024px) {
+    .spiral-map-container {
+        max-width: 30%;
+        width: 30%;
+        max-height: 20vh;
+        right: 15px;
+        top: 15px;
+    }
+    
     #spiral-food-popup {
         max-width: 45%;
         width: 45%;
@@ -1504,6 +1534,17 @@ p, li {
     .slide-3 .spiral-wrapper-container {
         flex-direction: column;
         align-items: center;
+    }
+    
+    .spiral-map-container {
+        position: relative;
+        right: auto;
+        top: auto;
+        max-width: 60%;
+        width: 60%;
+        max-height: 25vh;
+        margin: 15px auto 0;
+        min-width: auto;
     }
     
     #spiral-food-popup {
