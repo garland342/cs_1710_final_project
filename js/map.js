@@ -1,5 +1,5 @@
 // ============================================
-// CONFIGURATION
+// DUAL MAP DASHBOARD: CONFIGURATION
 // ============================================
 
 const CSV_FILE = "data/agg_health.csv";
