@@ -1392,6 +1392,31 @@ p, li {
     background: transparent;
 }
 
+/* Slide 8: Meet The Team */
+.slide-8 {
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.slide-8 .new-section-header {
+    margin: 0 0 40px 0;
+    padding: 0;
+}
+
+#team-container {
+    width: 100%;
+    max-width: 100%;
+    flex: 1;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 600px;
+}
+
 /* Carousel Navigation Controls */
 .carousel-controls {
     position: fixed;
