@@ -630,7 +630,7 @@ function createDistanceSlider(containerId, dataPath) {
 class DashboardCarousel {
     constructor() {
         this.currentSlide = 0;
-        this.totalSlides = 5;
+        this.totalSlides = 6;
         this.isTransitioning = false;
         this.transitionDuration = 500; // ms
         
@@ -772,9 +772,16 @@ class DashboardCarousel {
                     window.dispatchEvent(new Event('resize'));
                 }
                 break;
-            case 6: // Slide 5: Community orgs
+            case 4: // Slide 5: Community orgs
                 console.log('Rendering slide 7 - Community organizations');
                 window.dispatchEvent(new Event('resize'));
+                break;
+            case 5: // Slide 6: Meet The Team
+                console.log('Rendering slide 8 - Meet The Team');
+                const teamContainer = document.getElementById('team-container');
+                if (teamContainer && teamContainer.offsetParent !== null) {
+                    createTeamSection('#team-container');
+                }
                 break;
         }
     }
@@ -790,6 +797,242 @@ class DashboardCarousel {
     getCurrentSlide() {
         return this.currentSlide;
     }
+}
+
+// Create Team Section
+function createTeamSection(containerId) {
+    const container = d3.select(containerId);
+    if (container.empty()) {
+        console.error(`Container ${containerId} not found`);
+        return null;
+    }
+
+    // Clear any existing content
+    container.selectAll("*").remove();
+
+    const teamMembers = [
+        {
+            name: "Oscar Boccelli",
+            year: "'26",
+            major: "Economics",
+            house: "Currier House",
+            image: "images/oscar-boccelli.jpg"
+        },
+        {
+            name: "Dani Ebaseh-Onofa",
+            year: "'26",
+            major: "Computer Science & Neuroscience",
+            house: "Cabot House",
+            image: "images/dani-onofa.jpg"
+        },
+        {
+            name: "Garland Catlette",
+            year: "'26",
+            major: "Computer Science",
+            house: "Currier House",
+            image: "images/garland-catlette.jpg"
+        }
+    ];
+
+    const containerRect = container.node().getBoundingClientRect();
+    const width = containerRect.width > 0 ? containerRect.width : window.innerWidth - 100;
+    const height = 800;
+
+    const svg = container.append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+    // Create clipPath for circular images
+    const defs = svg.append("defs");
+    const clipPath = defs.append("clipPath")
+        .attr("id", "team-circle-clip");
+    clipPath.append("circle")
+        .attr("r", 120)
+        .attr("cx", 0)
+        .attr("cy", 0);
+
+    const circleRadius = 120;
+    const spacing = 100;
+    const startX = (width - (3 * (circleRadius * 2 + spacing) - spacing)) / 2;
+    const startY = 220; // Increased from 150 to push photos down more
+
+    // Create team member groups
+    const teamGroups = svg.selectAll(".team-member")
+        .data(teamMembers)
+        .join("g")
+        .attr("class", "team-member")
+        .attr("transform", (d, i) => {
+            const x = startX + i * (circleRadius * 2 + spacing) + circleRadius;
+            return `translate(${x}, ${startY})`;
+        });
+
+    // Add hover circle
+    teamGroups.append("circle")
+        .attr("r", circleRadius)
+        .attr("fill", "transparent")
+        .attr("stroke", "#667eea")
+        .attr("stroke-width", 3)
+        .attr("opacity", 0)
+        .attr("class", "team-hover-circle");
+
+    // Add headshot images
+    teamGroups.append("image")
+        .attr("href", d => d.image)
+        .attr("x", -circleRadius)
+        .attr("y", -circleRadius)
+        .attr("width", circleRadius * 2)
+        .attr("height", circleRadius * 2)
+        .attr("clip-path", "url(#team-circle-clip)")
+        .attr("class", "team-image")
+        .attr("preserveAspectRatio", "xMidYMid slice")
+        .style("transition", "all 0.3s")
+        .on("error", function() {
+            d3.select(this).style("display", "none");
+        });
+
+    // Add name, year, major, house text below each circle
+    const textStartY = circleRadius + 30; // Relative to the circle position
+    teamGroups.each(function(d, i) {
+        const g = d3.select(this);
+        const x = startX + i * (circleRadius * 2 + spacing) + circleRadius;
+        
+        g.append("text")
+            .attr("text-anchor", "middle")
+            .attr("x", 0)
+            .attr("y", textStartY)
+            .attr("class", "team-name")
+            .style("font-size", "20px")
+            .style("font-weight", "bold")
+            .style("fill", "#2c3e50")
+            .text(`${d.name} ${d.year}`);
+
+        g.append("text")
+            .attr("text-anchor", "middle")
+            .attr("x", 0)
+            .attr("y", textStartY + 25)
+            .attr("class", "team-major")
+            .style("font-size", "16px")
+            .style("fill", "#495057")
+            .text(d.major);
+
+        g.append("text")
+            .attr("text-anchor", "middle")
+            .attr("x", 0)
+            .attr("y", textStartY + 50)
+            .attr("class", "team-house")
+            .style("font-size", "16px")
+            .style("fill", "#495057")
+            .text(d.house);
+    });
+
+    // Add hover effects
+    teamGroups
+        .on("mouseenter", function() {
+            const g = d3.select(this);
+            g.select(".team-hover-circle")
+                .transition()
+                .duration(200)
+                .attr("opacity", 1)
+                .attr("stroke-width", 4);
+            g.select(".team-image")
+                .transition()
+                .duration(200)
+                .attr("width", circleRadius * 2.1)
+                .attr("height", circleRadius * 2.1)
+                .attr("x", -circleRadius * 1.05)
+                .attr("y", -circleRadius * 1.05);
+        })
+        .on("mouseleave", function() {
+            const g = d3.select(this);
+            g.select(".team-hover-circle")
+                .transition()
+                .duration(200)
+                .attr("opacity", 0)
+                .attr("stroke-width", 3);
+            g.select(".team-image")
+                .transition()
+                .duration(200)
+                .attr("width", circleRadius * 2)
+                .attr("height", circleRadius * 2)
+                .attr("x", -circleRadius)
+                .attr("y", -circleRadius);
+        });
+
+    // Add mission statement container
+    const missionY = startY + circleRadius + 120; // Position relative to photos and text
+    const missionWidth = width * 0.8;
+    const missionX = (width - missionWidth) / 2;
+
+    const missionGroup = svg.append("g")
+        .attr("class", "mission-statement");
+
+    // Mission Statement title
+    missionGroup.append("text")
+        .attr("x", missionX + 20)
+        .attr("y", missionY + 35)
+        .attr("class", "mission-title")
+        .style("font-size", "18px")
+        .style("font-weight", "bold")
+        .style("fill", "#2c3e50")
+        .text("Mission Statement:");
+
+    // Mission Statement text
+    const missionText = "Given our team's collective experiences with food deserts, we wanted to dive deeper into their impacts that are not typically studied, namely the effects of food deserts on individual and associated health outcomes to raise awareness on their interconnectedness and various community organizations helping to fight against food insecurity and promote health in vulnerable populations.";
+
+    const missionTextElement = missionGroup.append("text")
+        .attr("x", missionX + 20)
+        .attr("y", missionY + 60)
+        .attr("class", "mission-text")
+        .style("font-size", "15px")
+        .style("fill", "#495057")
+        .text(missionText);
+
+    // Wrap text function
+    function wrapText(textElement, width) {
+        let totalLines = 0;
+        textElement.each(function() {
+            const text = d3.select(this);
+            const words = text.text().split(/\s+/).reverse();
+            let word;
+            let line = [];
+            let lineNumber = 0;
+            const lineHeight = 1.4;
+            const y = text.attr("y");
+            const x = text.attr("x");
+            let tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", 0);
+
+            while (word = words.pop()) {
+                line.push(word);
+                tspan.text(line.join(" "));
+                if (tspan.node().getComputedTextLength() > width) {
+                    line.pop();
+                    tspan.text(line.join(" "));
+                    line = [word];
+                    tspan = text.append("tspan").attr("x", x).attr("y", y).attr("dy", ++lineNumber * lineHeight + "em").text(word);
+                }
+            }
+            totalLines = lineNumber + 1;
+        });
+        return totalLines;
+    }
+
+    // Wrap text and get line count
+    const lineCount = wrapText(missionTextElement, missionWidth - 40);
+    
+    // Calculate dynamic height based on wrapped text
+    const lineHeight = 15 * 1.4; // font-size * line-height
+    const dynamicHeight = 60 + (lineCount * lineHeight) + 30; // top padding + text + bottom padding
+    
+    // Add black border rectangle with dynamic height (add it BEFORE text so it's behind)
+    const missionRect = missionGroup.insert("rect", ":first-child")
+        .attr("x", missionX)
+        .attr("y", missionY)
+        .attr("width", missionWidth)
+        .attr("height", dynamicHeight)
+        .attr("fill", "white")
+        .attr("stroke", "black")
+        .attr("stroke-width", 2)
+        .attr("rx", 8);
 }
 
 // Initialize carousel when document is ready
